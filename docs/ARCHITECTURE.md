@@ -1,7 +1,7 @@
-# Rotherham.town — Architecture & Stack Decision Record
+# Rovrum (rovrum.town) — Architecture & Stack Decision Record
 
 > **Status:** Proposal agreed, pre-build (Phase 0 not yet started)
-> **Domain:** https://www.rotherham.town
+> **Domain:** https://www.rovrum.town
 > **Last updated:** 2026-07-04
 
 ---
@@ -44,7 +44,7 @@ The **data pipeline is the product**; the website and app are just views onto it
 | **Ingestion workers** | Standalone Node processes (not serverless) | Scraping needs long-running, retry-friendly, portable execution. Runs in Docker anywhere. |
 | **Queue / scheduling** | **pg-boss** (job queue on Postgres) | Retries, backoff, cron, concurrency, dead-letter — all on the Postgres we already run. No Redis to host/back up/pay for. Job volume is tiny, so BullMQ's throughput edge isn't needed yet. |
 | **Scraping** | `undici`/`fetch` + Cheerio (HTML); RSS/Atom parser; Playwright only when a source needs JS rendering | Cost order: official feeds/APIs > RSS > HTML scrape > headless browser. |
-| **AI layer** | Thin `@rotherham/ai` package with a `Provider` interface | Claude/OpenAI/local behind one API; pick per-task. |
+| **AI layer** | Thin `@rovrum/ai` package with a `Provider` interface | Claude/OpenAI/local behind one API; pick per-task. |
 | **Object storage** | **Cloudflare R2** (S3-compatible) | Zero egress fees (matters for serving generated images/video). Portable — swap endpoint for real S3 or self-hosted MinIO anytime. |
 | **Deploy** | Docker images; web on Vercel/Cloudflare, workers + Postgres on Railway/Fly | Move hosts = repoint deploy, not a rewrite. |
 
@@ -74,7 +74,7 @@ These were debated and reversed from the first proposal — recorded so we don't
 ## 4. Monorepo shape
 
 ```
-rotherham/
+rovrum/
 ├─ apps/
 │  ├─ web/            # Astro — public site (Phase 2)
 │  ├─ workers/        # ingestion + social scheduler (Phase 1) ← built first
@@ -111,10 +111,10 @@ Supporting tables:
 
 | Phase | Name | Scope |
 |---|---|---|
-| **0** | **Foundation** *(start here)* | Monorepo scaffold · `infra/docker-compose` (Postgres + MinIO) · `@rotherham/db` Prisma schema (content model) + first migration · CLAUDE.md + dev-workflow + Claude Code guardrails. |
-| **1** | **Ingestion** | `@rotherham/sources` adapter interface + 3–5 real Rotherham sources (RSS first) · pg-boss scheduler in `apps/workers` · dedup · `ingest_runs` observability. **← "data pipeline first" milestone: verify data quality in Prisma Studio here.** |
+| **0** | **Foundation** *(start here)* | Monorepo scaffold · `infra/docker-compose` (Postgres + MinIO) · `@rovrum/db` Prisma schema (content model) + first migration · CLAUDE.md + dev-workflow + Claude Code guardrails. |
+| **1** | **Ingestion** | `@rovrum/sources` adapter interface + 3–5 real Rotherham sources (RSS first) · pg-boss scheduler in `apps/workers` · dedup · `ingest_runs` observability. **← "data pipeline first" milestone: verify data quality in Prisma Studio here.** |
 | **2** | **Web MVP** | Astro site reading the DB · News vertical end-to-end · then sports/events/jobs. |
-| **3** | **AI + Social** | `@rotherham/ai` + `@rotherham/social` · generate + schedule posts · **human-approval queue** before full automation. |
+| **3** | **AI + Social** | `@rovrum/ai` + `@rovrum/social` · generate + schedule posts · **human-approval queue** before full automation. |
 | **4** | **Mobile** | Expo app on the shared API/types. |
 | — | **Branding** | Runs alongside (currently no branding). Can generate a starter identity (name treatment, palette, logo direction) when wanted — not blocking. |
 

@@ -1,12 +1,12 @@
-# rotherham.town
+# rovrum.town
 
 ![Status: Alpha](https://img.shields.io/badge/status-alpha-orange)
 ![License: Proprietary](https://img.shields.io/badge/license-proprietary-red)
-[![Website](https://img.shields.io/badge/web-rotherham.town-blue)](https://www.rotherham.town)
+[![Website](https://img.shields.io/badge/web-rovrum.town-blue)](https://www.rovrum.town)
 
 > The place for everything Rotherham — news, sports, events, and jobs, aggregated from across the web and served up in one place.
 
-**rotherham.town** is a content platform that gathers news, sports, events, jobs (and more) from many local sources, normalises them into a single feed, and surfaces them on the web and — in time — a mobile app. It also generates social media content automatically, so the whole thing runs with minimal manual effort.
+**Rovrum** (rovrum.town) is a content platform that gathers news, sports, events, jobs (and more) from many local sources, normalises them into a single feed, and surfaces them on the web and — in time — a mobile app. It also generates social media content automatically, so the whole thing runs with minimal manual effort.
 
 The **data pipeline is the product**; the website and app are views onto it.
 
