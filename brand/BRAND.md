@@ -58,7 +58,8 @@ All logo SVGs are **outlined to vector paths** (Bitter Bold baked in as shapes) 
 | `rovrum-avatar-outlined.svg` / `png/rovrum-avatar-1000.png` / `-400.png` | Square profile avatar — R. monogram + red dot on ink. Use everywhere as the profile picture. |
 | `rovrum-logo-light-outlined.svg` / `png/rovrum-logo-light-1800.png` | Wordmark for **light** backgrounds (ink text) |
 | `rovrum-logo-dark-outlined.svg` / `png/rovrum-logo-dark-1800.png` | Wordmark for **dark** backgrounds (paper text) |
-| `rovrum-cover-outlined.svg` / `png/rovrum-cover-1500x500.png` | Master banner/cover (X / Facebook / Twitter header) |
+| `rovrum-cover-outlined.svg` / `png/rovrum-cover-1500x500.png` | Master banner/cover (X / Twitter header) |
+| `png/rovrum-cover-facebook-1640x856.png` | Facebook Page cover |
 | `rovrum-cover-linkedin-outlined.svg` / `png/rovrum-cover-linkedin-1128x376.png` | LinkedIn-ratio cover |
 
 Outlined SVGs are the source of truth — re-render any size with `rsvg-convert -w <width> file.svg -o out.png` (no font dependency). The `fonts/` folder holds the Bitter TTF/woff2 used to generate them, kept for regenerating assets later.
