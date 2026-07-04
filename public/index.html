@@ -204,10 +204,36 @@
     button:hover { background: var(--red); }
     button:active { transform: translateY(1px); }
     button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+    button[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
     .form-note {
       margin: 0.7rem 0 0;
       font-size: 0.8rem;
       color: var(--stone);
+    }
+    .form-note.error { color: var(--red); }
+
+    /* success state: form is hidden, this replaces it */
+    .signup.done form,
+    .signup.done .form-note { display: none; }
+    .signup-success {
+      display: none;
+      margin: 1rem 0 0;
+      padding: 1rem 1.15rem;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--red);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+    .signup.done .signup-success { display: block; }
+    .signup-success strong {
+      font-family: var(--serif);
+      font-weight: 700;
     }
 
     /* ---- footer ---- */
@@ -306,22 +332,23 @@
       <h2>Be first through t' door</h2>
       <p>We're building it now. Leave your email and we'll give tha' a shout the moment it's live.</p>
 
-      <!-- TODO: paste your Web3Forms access key (free at https://web3forms.com) -->
-      <form action="https://api.web3forms.com/submit" method="POST">
-        <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
-        <input type="hidden" name="subject" value="New Rovrum launch signup" />
-        <input type="hidden" name="from_name" value="Rovrum holding page" />
+      <form id="signup-form" novalidate>
         <input
           type="email"
           name="email"
+          id="signup-email"
           required
           autocomplete="email"
           placeholder="you@example.com"
           aria-label="Your email address"
         />
-        <button type="submit">Notify me</button>
+        <button type="submit" id="signup-submit">Notify me</button>
       </form>
-      <p class="form-note">No faffing, no spam. One email, when we launch.</p>
+      <p class="form-note" id="form-note" role="status" aria-live="polite">No faffing, no spam. One email, when we launch.</p>
+      <p class="signup-success" id="signup-success">
+        <strong>Reyt, you're on the list.</strong><br />
+        We'll give tha' a shout the moment Rovrum goes live. Ta.
+      </p>
     </section>
   </main>
 
@@ -337,5 +364,66 @@
       <p class="colophon">&copy; 2026. A <a href="https://www.colouringcode.com" target="_blank" rel="noopener">Colouring Code</a> design and build. Made with <span class="heart" aria-hidden="true">&hearts;</span><span class="sr-only">love</span> in Rovrum.</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      // Web3Forms access key — get a free one at https://web3forms.com
+      var ACCESS_KEY = "e354ff92-5070-48e9-8105-7931a4d2d0bd";
+
+      var form    = document.getElementById("signup-form");
+      var email   = document.getElementById("signup-email");
+      var button  = document.getElementById("signup-submit");
+      var note    = document.getElementById("form-note");
+      var section = form.closest(".signup");
+
+      function fail(msg) {
+        note.textContent = msg;
+        note.classList.add("error");
+        button.disabled = false;
+        button.textContent = "Notify me";
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        note.classList.remove("error");
+
+        if (!email.checkValidity()) {
+          fail("That email doesn't look reyt — give it another go.");
+          email.focus();
+          return;
+        }
+
+        if (ACCESS_KEY === "YOUR_WEB3FORMS_ACCESS_KEY") {
+          fail("Signups open soon — check back shortly.");
+          return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Signing tha' up…";
+
+        fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({
+            access_key: ACCESS_KEY,
+            email: email.value,
+            subject: "New Rovrum launch signup",
+            from_name: "Rovrum holding page"
+          })
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data && data.success) {
+              section.classList.add("done");
+            } else {
+              fail("Summat went wrong — try again in a bit.");
+            }
+          })
+          .catch(function () {
+            fail("Couldn't reach us — check tha' connection and try again.");
+          });
+      });
+    })();
+  </script>
 </body>
 </html>
