@@ -47,3 +47,4 @@ docker-data/
 
 # Expo (mobile, later)
 .expo/
+.vercel
