@@ -42,6 +42,22 @@ services:
       timeout: 5s
       retries: 10
 
+  # The ingestion worker. Built from the repo root; runs migrations then starts.
+  # Portable by default — a plain container, no host lock-in.
+  workers:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.workers
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Inside the compose network Postgres is reachable at host "postgres".
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://rovrum:rovrum@postgres:5432/rovrum?schema=public}
+      INGEST_USER_AGENT: ${INGEST_USER_AGENT:-}
+      INGEST_DISPATCH_CRON: ${INGEST_DISPATCH_CRON:-}
+
   # One-shot: create the bucket then exit.
   createbuckets:
     image: minio/mc:latest

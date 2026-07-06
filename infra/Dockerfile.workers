@@ -1,0 +1,59 @@
+# Rovrum ingestion worker — portable, plain Docker (no host lock-in).
+# Multi-stage: build the monorepo, then ship a lean runtime with prod deps only.
+#
+# Build from the REPO ROOT so the whole workspace is in context:
+#   docker build -f infra/Dockerfile.workers -t rovrum-workers .
+
+# ── Base: Node 22 (Debian slim — Prisma engines need glibc, not Alpine musl) ──
+FROM node:22-slim AS base
+ENV PNPM_HOME=/pnpm
+ENV PATH=$PNPM_HOME:$PATH
+# OpenSSL is required by Prisma's query engine at runtime.
+RUN apt-get update && apt-get install -y --no-install-recommends openssl \
+  && rm -rf /var/lib/apt/lists/*
+RUN corepack enable
+WORKDIR /app
+
+# ── Builder: install everything, generate Prisma client, build TS ────────────
+FROM base AS builder
+# Copy manifests first for layer caching, then install with the frozen lockfile.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY packages/tsconfig/package.json packages/tsconfig/
+COPY packages/eslint-config/package.json packages/eslint-config/
+COPY packages/db/package.json packages/db/
+COPY packages/core/package.json packages/core/
+COPY packages/sources/package.json packages/sources/
+COPY apps/workers/package.json apps/workers/
+RUN pnpm install --frozen-lockfile
+
+# Copy sources and build the worker's dependency chain.
+COPY packages/tsconfig packages/tsconfig
+COPY packages/db packages/db
+COPY packages/core packages/core
+COPY packages/sources packages/sources
+COPY apps/workers apps/workers
+# `prisma generate` doesn't connect, but prisma.config.ts eagerly requires
+# DATABASE_URL — give it a throwaway value just for codegen. The real URL is
+# supplied at runtime.
+RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter @rovrum/db db:generate \
+  && pnpm --filter @rovrum/db --filter @rovrum/core --filter @rovrum/sources --filter @rovrum/workers build
+
+# Prune to production dependencies only (drops dev deps like typescript/vitest).
+RUN pnpm --filter @rovrum/workers deploy --prod --legacy /app/deploy
+
+# ── Runtime: lean image with built output + prod deps ────────────────────────
+FROM base AS runtime
+ENV NODE_ENV=production
+# The pruned worker: node_modules has the built @rovrum/* deps inlined (and
+# @rovrum/db/dist carries its generated client + Linux query engine).
+COPY --from=builder /app/deploy/node_modules ./node_modules
+COPY --from=builder /app/deploy/dist ./dist
+# Prisma needs the schema + migrations on disk to run `migrate deploy` at boot.
+COPY --from=builder /app/packages/db/prisma ./prisma
+COPY infra/entrypoint.workers.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Run as the non-root user the node image ships with.
+USER node
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["node", "dist/index.js"]
