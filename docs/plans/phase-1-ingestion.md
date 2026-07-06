@@ -1,7 +1,11 @@
 # Phase 1 — Ingestion: the data pipeline
 
-> **Status:** Approved 2026-07-06. Broken into GitHub issues (see below); build proceeds
-> task-by-task, test-first, on `feat/phase-1-ingestion`.
+> **Status:** Implemented on `feat/phase-1-ingestion` (issues #3–#7). Verified against
+> live feeds: 18 enabled RSS sources → 160 items across NEWS/SPORTS/EVENTS/JOBS, dedup
+> holds (re-ingest inserts 0 new), regional feeds filtered (~2 kept of ~25), aggregator
+> boundary holds (excerpts ≤500 chars, every item has a canonical URL + preserved `raw`).
+> Both HTML scrapers deferred to #9 (Phase 1b) after the live run showed bad selectors.
+> Two schema additions: `Source.url @unique`, `Source.vertical`.
 
 ## Context
 

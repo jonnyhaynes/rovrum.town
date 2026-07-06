@@ -20,18 +20,18 @@ The **data pipeline is the product**; the website and app are views onto it.
 
 ## Stack
 
-| Layer | Choice |
-|---|---|
-| Monorepo | pnpm + Turborepo |
-| Web | Astro |
-| Mobile *(later)* | Expo / React Native |
-| Database | PostgreSQL + Prisma |
-| Queue / scheduling | pg-boss (on Postgres) |
-| Workers | Dockerised standalone Node |
-| Scraping | Cheerio / RSS, Playwright where needed |
-| AI | Provider-agnostic layer |
-| Storage | Cloudflare R2 (S3-compatible) |
-| Hosting | Vercel/Cloudflare (web) + Railway/Fly (workers/DB) |
+| Layer              | Choice                                             |
+| ------------------ | -------------------------------------------------- |
+| Monorepo           | pnpm + Turborepo                                   |
+| Web                | Astro                                              |
+| Mobile _(later)_   | Expo / React Native                                |
+| Database           | PostgreSQL + Prisma                                |
+| Queue / scheduling | pg-boss (on Postgres)                              |
+| Workers            | Dockerised standalone Node                         |
+| Scraping           | Cheerio / RSS, Playwright where needed             |
+| AI                 | Provider-agnostic layer                            |
+| Storage            | Cloudflare R2 (S3-compatible)                      |
+| Hosting            | Vercel/Cloudflare (web) + Railway/Fly (workers/DB) |
 
 Everything is **Docker-first and portable** — any host is a deploy target, never a dependency.
 
@@ -40,7 +40,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full architecture dec
 ## Roadmap
 
 - [x] **Phase 0 — Foundation:** monorepo, docker infra, DB schema
-- [ ] **Phase 1 — Ingestion:** source adapters, scheduler, dedup, data-quality verification
+- [x] **Phase 1 — Ingestion:** source adapters (RSS + HTML), pg-boss scheduler, dedup, `ingest_runs` observability, 18 live Rotherham RSS sources
 - [ ] **Phase 2 — Web MVP:** Astro site, News vertical then the rest
 - [ ] **Phase 3 — AI + Social:** content generation, scheduling, approval queue
 - [ ] **Phase 4 — Mobile:** Expo app on the shared API
