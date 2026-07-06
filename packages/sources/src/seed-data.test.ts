@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { SEED_SOURCES } from "./seed-data.js";
 
 describe("SEED_SOURCES", () => {
-  it("has the expected shape: 22 sources, 20 enabled, 2 disabled", () => {
+  it("has the expected shape: 22 sources, 18 enabled, 4 disabled", () => {
     expect(SEED_SOURCES).toHaveLength(22);
-    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(20);
-    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(2);
+    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(18);
+    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(4);
   });
 
   it("has unique URLs (upsert key must not collide)", () => {
@@ -27,9 +27,18 @@ describe("SEED_SOURCES", () => {
     }
   });
 
-  it("disables exactly the Playwright-only sources", () => {
+  it("disables the sources not yet fit to serve (HTML selector work + Playwright)", () => {
     const disabled = SEED_SOURCES.filter((s) => !s.enabled).map((s) => s.name);
-    expect(disabled).toEqual(["Rotherham United (Millers) — official", "NHS Jobs — Rotherham"]);
+    expect(disabled).toEqual([
+      "Rotherham MBC — Jobs",
+      "Eventbrite — Rotherham",
+      "Rotherham United (Millers) — official",
+      "NHS Jobs — Rotherham",
+    ]);
+  });
+
+  it("all enabled sources are RSS this phase (HTML scrapers disabled pending fixes)", () => {
+    expect(SEED_SOURCES.filter((s) => s.enabled).every((s) => s.type === "RSS")).toBe(true);
   });
 
   it("covers all four verticals", () => {

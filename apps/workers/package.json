@@ -16,7 +16,8 @@
     "@rovrum/core": "workspace:*",
     "@rovrum/db": "workspace:*",
     "@rovrum/sources": "workspace:*",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "pg-boss": "^10.1.5"
   },
   "devDependencies": {
     "@rovrum/eslint-config": "workspace:*",

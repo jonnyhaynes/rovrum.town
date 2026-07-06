@@ -184,14 +184,18 @@ export const SEED_SOURCES: SeedSource[] = [
     enabled: true,
   },
 
-  // ── HTML (Cheerio) — server-rendered, selectors in config ────────────────
+  // ── HTML (Cheerio) — disabled pending selector work (see follow-up) ──────
+  // A live run showed these need real markup work: council-jobs matched 0 items
+  // (wrong selectors) and Eventbrite returned global, non-Rotherham events (URL
+  // isn't location-scoping the cards). Seeded with best-guess selectors but
+  // disabled so we don't serve wrong data; fix against live markup in follow-up.
   {
     name: "Rotherham MBC — Jobs",
     type: "HTML",
     url: "https://www.rotherham.gov.uk/jobs",
     vertical: "JOBS",
     fetchCadence: JOBS,
-    enabled: true,
+    enabled: false,
     config: {
       selectors: {
         item: ".list--articles li, .job-list li",
@@ -207,7 +211,7 @@ export const SEED_SOURCES: SeedSource[] = [
     url: "https://www.eventbrite.co.uk/d/united-kingdom--rotherham/events/",
     vertical: "EVENTS",
     fetchCadence: SLOW,
-    enabled: true,
+    enabled: false,
     config: {
       selectors: {
         item: "section.event-card, div.event-card",
