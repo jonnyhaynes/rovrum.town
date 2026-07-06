@@ -21,6 +21,40 @@ importers:
         specifier: ^5.7.0
         version: 5.9.3
 
+  apps/workers:
+    dependencies:
+      '@rovrum/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@rovrum/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@rovrum/sources':
+        specifier: workspace:*
+        version: link:../../packages/sources
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.6.1
+    devDependencies:
+      '@rovrum/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@rovrum/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      eslint:
+        specifier: ^9.17.0
+        version: 9.39.4(jiti@2.7.0)
+      tsx:
+        specifier: ^4.19.2
+        version: 4.23.0
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.7(@types/node@22.20.0)(jiti@2.7.0)(tsx@4.23.0)
+
   packages/core:
     dependencies:
       '@rovrum/db':
