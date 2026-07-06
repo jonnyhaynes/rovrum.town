@@ -1,0 +1,56 @@
+# Local development infrastructure for Rovrum.
+# Postgres (primary DB + pg-boss queue) and MinIO (S3-compatible, stands in for
+# Cloudflare R2). Everything is plain Docker so any host is a deploy target.
+#
+#   docker compose -f infra/docker-compose.yml up -d
+#
+# See infra/README.md.
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-rovrum}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rovrum}
+      POSTGRES_DB: ${POSTGRES_DB:-rovrum}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../docker-data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rovrum} -d ${POSTGRES_DB:-rovrum}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:-minioadmin}
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # web console
+    volumes:
+      - ../docker-data/minio:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # One-shot: create the bucket then exit.
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 ${S3_ACCESS_KEY_ID:-minioadmin} ${S3_SECRET_ACCESS_KEY:-minioadmin};
+      mc mb --ignore-existing local/${S3_BUCKET:-rovrum};
+      exit 0;
+      "

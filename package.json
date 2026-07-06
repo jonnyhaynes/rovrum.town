@@ -1,0 +1,31 @@
+{
+  "name": "rovrum",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The place for everything Rotherham — a content-aggregation platform. The data pipeline is the product.",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
+    "db:generate": "pnpm --filter @rovrum/db db:generate",
+    "db:migrate": "pnpm --filter @rovrum/db db:migrate",
+    "db:studio": "pnpm --filter @rovrum/db db:studio",
+    "db:push": "pnpm --filter @rovrum/db db:push"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "prettier": "^3.4.2",
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
+  }
+}
