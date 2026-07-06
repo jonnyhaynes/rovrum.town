@@ -39,7 +39,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full architecture dec
 
 ## Roadmap
 
-- [ ] **Phase 0 — Foundation:** monorepo, docker infra, DB schema
+- [x] **Phase 0 — Foundation:** monorepo, docker infra, DB schema
 - [ ] **Phase 1 — Ingestion:** source adapters, scheduler, dedup, data-quality verification
 - [ ] **Phase 2 — Web MVP:** Astro site, News vertical then the rest
 - [ ] **Phase 3 — AI + Social:** content generation, scheduling, approval queue

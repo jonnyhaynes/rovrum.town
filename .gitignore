@@ -21,6 +21,8 @@ out/
 # Prisma
 prisma/*.db
 prisma/*.db-journal
+# Generated Prisma client (regenerated via `pnpm db:generate`)
+packages/db/src/generated/
 
 # Logs
 *.log

@@ -1,0 +1,137 @@
+// Rovrum content model — the source-agnostic heart of the pipeline.
+// See docs/ARCHITECTURE.md §5 for the design rationale.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Vertical {
+  NEWS
+  SPORTS
+  EVENTS
+  JOBS
+}
+
+enum SourceType {
+  RSS
+  HTML
+  API
+}
+
+enum SocialPostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  FAILED
+}
+
+enum IngestRunStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+/// A registered source (feed / API / page) we ingest from.
+model Source {
+  id           String       @id @default(cuid())
+  name         String
+  type         SourceType
+  url          String
+  /// Per-source fetch/scrape config (selectors, auth hints, etc.).
+  config       Json?
+  /// How often to fetch, in minutes.
+  fetchCadence Int          @default(60)
+  enabled      Boolean      @default(true)
+  lastFetchedAt DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  contentItems ContentItem[]
+  ingestRuns   IngestRun[]
+
+  @@map("sources")
+}
+
+/// The normalized unit every source adapter produces. Aggregator model:
+/// headline + excerpt + attribution + canonical link only — never full content.
+model ContentItem {
+  id           String    @id @default(cuid())
+  sourceId     String
+  source       Source    @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  vertical     Vertical
+  title        String
+  excerpt      String
+  canonicalUrl String
+  imageUrl     String?
+  author       String?
+  publishedAt  DateTime?
+
+  /// Stable hash of the item for dedup across runs/sources.
+  contentHash  String    @unique
+  /// Rotherham-relevance geo/tags.
+  location     String?
+
+  /// Original payload, so we never lose data the model doesn't yet capture.
+  raw          Json
+  /// Vertical-specific extensions (kept as jsonb for now).
+  eventDetails Json?
+  jobDetails   Json?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  socialPosts  SocialPost[]
+
+  @@index([vertical])
+  @@index([publishedAt])
+  @@index([sourceId])
+  @@map("content_items")
+}
+
+/// A generated social post: draft -> scheduled -> published, with per-platform
+/// variants (text/image/video) held in `variants`.
+model SocialPost {
+  id            String           @id @default(cuid())
+  contentItemId String?
+  contentItem   ContentItem?     @relation(fields: [contentItemId], references: [id], onDelete: SetNull)
+
+  status        SocialPostStatus @default(DRAFT)
+  /// Per-platform variants keyed by platform, e.g. { x: {...}, tiktok: { video } }.
+  variants      Json
+  scheduledFor  DateTime?
+  publishedAt   DateTime?
+  error         String?
+
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([status])
+  @@index([scheduledFor])
+  @@map("social_posts")
+}
+
+/// Observability for each ingestion run: what ran, what it found, what failed.
+model IngestRun {
+  id         String          @id @default(cuid())
+  sourceId   String?
+  source     Source?         @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  status     IngestRunStatus @default(RUNNING)
+  startedAt  DateTime        @default(now())
+  finishedAt DateTime?
+  itemsFound Int             @default(0)
+  itemsNew   Int             @default(0)
+  error      String?
+  stats      Json?
+
+  @@index([sourceId])
+  @@index([startedAt])
+  @@map("ingest_runs")
+}
