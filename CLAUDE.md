@@ -21,10 +21,15 @@ layer is **provider-agnostic**. Mobile (Expo) comes later. Strict TypeScript (av
 `any`). Tests run through the project's `test` script; lint with ESLint, format with
 Prettier, type-check with `tsc --noEmit`.
 
-> **Status: pre-build.** The monorepo isn't scaffolded yet (no `package.json`) —
-> today the repo is a holding page plus docs. Phase 0 builds the structure below.
-> See `docs/ARCHITECTURE.md` for the full decision record and phased plan, and the
-> intended monorepo shape (`apps/{web,workers,mobile}`, `packages/{db,core,sources,ai,social}`, `infra/`).
+> **Status: Phase 0 done.** The pnpm + Turborepo monorepo is scaffolded:
+> `packages/db` (`@rovrum/db` — Prisma schema for the content model + first migration),
+> shared config in `packages/{tsconfig,eslint-config}`, and `infra/docker-compose.yml`
+> (Postgres + MinIO). The live holding page (`public/`, `vercel.json`) is still separate
+> and untouched — `apps/web` (Astro) is Phase 2. See `docs/ARCHITECTURE.md` for the full
+> plan and the target shape (`apps/{web,workers,mobile}`, `packages/{db,core,sources,ai,social}`).
+>
+> **Local dev:** `docker compose -f infra/docker-compose.yml up -d`, copy `.env.example`
+> → `.env`, then `pnpm install && pnpm db:generate && pnpm db:migrate`. See `infra/README.md`.
 
 ## Load-bearing principles
 
