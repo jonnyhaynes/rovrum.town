@@ -8,7 +8,7 @@
 Rovrum's **data pipeline is the product** (`docs/ARCHITECTURE.md` §1). Phase 0 landed the
 foundation: the pnpm + Turborepo monorepo, `infra/docker-compose` (Postgres + MinIO), and
 `@rovrum/db` — the Prisma content model (`Source`, `ContentItem`, `SocialPost`, `IngestRun`)
-with its first migration. Nothing yet *fills* that model.
+with its first migration. Nothing yet _fills_ that model.
 
 Phase 1 is the **"data pipeline first" milestone** (`ARCHITECTURE.md` §6): pull from real
 Rotherham sources, normalize into `content_item`, dedup, and run it on a schedule as a
@@ -18,7 +18,7 @@ Rotherham-relevant content flowing in from real feeds.**
 
 ### Decisions locked with the user
 
-- **Adapters this phase: RSS *and* HTML (Cheerio).** Build the adapter interface, a robust
+- **Adapters this phase: RSS _and_ HTML (Cheerio).** Build the adapter interface, a robust
   RSS adapter (covers the 19 verified feeds), and a Cheerio HTML adapter (council jobs,
   Eventbrite). **Playwright is deferred** to a follow-up (Phase 1b) — the JS-rendered sources
   (notably Rotherham United's own site) are seeded as `disabled` rows so the registry is
@@ -50,26 +50,26 @@ scrape HTML) on 2026-07-06. `regional: true` sources get the Rotherham keyword f
 
 ### RSS feeds — enabled
 
-| Name | Vertical | URL | Flags |
-|------|----------|-----|-------|
-| Rotherham Advertiser — All | NEWS | `https://www.rotherhamadvertiser.co.uk/rss/` | native |
-| Rotherham Advertiser — News | NEWS | `https://www.rotherhamadvertiser.co.uk/news/rss/` | native |
-| Rotherham Advertiser — Sport | SPORTS | `https://www.rotherhamadvertiser.co.uk/sport/rss/` | native |
-| Rotherham Advertiser — Rotherham United | SPORTS | `https://www.rotherhamadvertiser.co.uk/sport/football/rotherham-united/rss/` | native |
-| Rotherham Advertiser — What's On | EVENTS | `https://www.rotherhamadvertiser.co.uk/whats-on/rss/` | native |
-| Rotherham Advertiser — Jobs | JOBS | `https://www.rotherhamadvertiser.co.uk/jobs/rss/` | native, low-volume |
-| Rotherham MBC — News | NEWS | `https://www.rotherham.gov.uk/rss/news` | native, official |
-| Rotherham MBC — Events | EVENTS | `https://www.rotherham.gov.uk/rss/events` | native, official |
-| The Star — News | NEWS | `https://www.thestar.co.uk/news/rss` | **regional** |
-| The Star — Sport | SPORTS | `https://www.thestar.co.uk/sport/rss` | **regional** |
-| The Star — Rotherham United | SPORTS | `https://www.thestar.co.uk/sport/football/rotherham-united/rss` | native |
-| YorkshireLive — Rotherham tag | NEWS | `https://www.examinerlive.co.uk/all-about/rotherham/?service=rss` | native (examinerlive host) |
-| BBC News — South Yorkshire | NEWS | `https://feeds.bbci.co.uk/news/england/south_yorkshire/rss.xml` | **regional** |
-| Rother Radio | NEWS | `https://www.rotherradio.co.uk/feed/` | native |
-| Rotherham College | NEWS | `https://www.rotherham.ac.uk/feed/` | native |
-| Wentworth Woodhouse | EVENTS | `https://wentworthwoodhouse.org.uk/feed/` | native, low/uncertain volume |
-| Reddit r/Rotherham | NEWS | `https://www.reddit.com/r/rotherham/.rss` | native, UGC (Atom) |
-| Reed — Rotherham jobs | JOBS | `https://www.reed.co.uk/jobs/rss?keywords=&locationName=Rotherham` | native |
+| Name                                    | Vertical | URL                                                                          | Flags                        |
+| --------------------------------------- | -------- | ---------------------------------------------------------------------------- | ---------------------------- |
+| Rotherham Advertiser — All              | NEWS     | `https://www.rotherhamadvertiser.co.uk/rss/`                                 | native                       |
+| Rotherham Advertiser — News             | NEWS     | `https://www.rotherhamadvertiser.co.uk/news/rss/`                            | native                       |
+| Rotherham Advertiser — Sport            | SPORTS   | `https://www.rotherhamadvertiser.co.uk/sport/rss/`                           | native                       |
+| Rotherham Advertiser — Rotherham United | SPORTS   | `https://www.rotherhamadvertiser.co.uk/sport/football/rotherham-united/rss/` | native                       |
+| Rotherham Advertiser — What's On        | EVENTS   | `https://www.rotherhamadvertiser.co.uk/whats-on/rss/`                        | native                       |
+| Rotherham Advertiser — Jobs             | JOBS     | `https://www.rotherhamadvertiser.co.uk/jobs/rss/`                            | native, low-volume           |
+| Rotherham MBC — News                    | NEWS     | `https://www.rotherham.gov.uk/rss/news`                                      | native, official             |
+| Rotherham MBC — Events                  | EVENTS   | `https://www.rotherham.gov.uk/rss/events`                                    | native, official             |
+| The Star — News                         | NEWS     | `https://www.thestar.co.uk/news/rss`                                         | **regional**                 |
+| The Star — Sport                        | SPORTS   | `https://www.thestar.co.uk/sport/rss`                                        | **regional**                 |
+| The Star — Rotherham United             | SPORTS   | `https://www.thestar.co.uk/sport/football/rotherham-united/rss`              | native                       |
+| YorkshireLive — Rotherham tag           | NEWS     | `https://www.examinerlive.co.uk/all-about/rotherham/?service=rss`            | native (examinerlive host)   |
+| BBC News — South Yorkshire              | NEWS     | `https://feeds.bbci.co.uk/news/england/south_yorkshire/rss.xml`              | **regional**                 |
+| Rother Radio                            | NEWS     | `https://www.rotherradio.co.uk/feed/`                                        | native                       |
+| Rotherham College                       | NEWS     | `https://www.rotherham.ac.uk/feed/`                                          | native                       |
+| Wentworth Woodhouse                     | EVENTS   | `https://wentworthwoodhouse.org.uk/feed/`                                    | native, low/uncertain volume |
+| Reddit r/Rotherham                      | NEWS     | `https://www.reddit.com/r/rotherham/.rss`                                    | native, UGC (Atom)           |
+| Reed — Rotherham jobs                   | JOBS     | `https://www.reed.co.uk/jobs/rss?keywords=&locationName=Rotherham`           | native                       |
 
 > The Star — All (`/rss`, ~67 items) is intentionally **not** seeded: its content is fully
 > covered by the News + Sport section feeds, so seeding it would only add duplicate ingest work
@@ -77,17 +77,17 @@ scrape HTML) on 2026-07-06. `regional: true` sources get the Rotherham keyword f
 
 ### HTML (Cheerio) — enabled
 
-| Name | Vertical | URL | Notes |
-|------|----------|-----|-------|
-| Rotherham MBC — Jobs | JOBS | `https://www.rotherham.gov.uk/jobs` | server-rendered list; CSS selectors in `config` |
-| Eventbrite — Rotherham | EVENTS | `https://www.eventbrite.co.uk/d/united-kingdom--rotherham/events/` | server-rendered cards; verify selectors, watch for markup drift |
+| Name                   | Vertical | URL                                                                | Notes                                                           |
+| ---------------------- | -------- | ------------------------------------------------------------------ | --------------------------------------------------------------- |
+| Rotherham MBC — Jobs   | JOBS     | `https://www.rotherham.gov.uk/jobs`                                | server-rendered list; CSS selectors in `config`                 |
+| Eventbrite — Rotherham | EVENTS   | `https://www.eventbrite.co.uk/d/united-kingdom--rotherham/events/` | server-rendered cards; verify selectors, watch for markup drift |
 
 ### Seeded but `disabled` (need Playwright — Phase 1b)
 
-| Name | Vertical | URL | Why disabled |
-|------|----------|-----|--------------|
-| Rotherham United (Millers) — official | SPORTS | `https://www.themillers.co.uk/news/` | JS-rendered app, no SSR RSS. Covered meanwhile by the Advertiser + Star RUFC feeds. |
-| NHS Jobs — Rotherham | JOBS | `https://www.jobs.nhs.uk/candidate/search/results?location=Rotherham` | New NHS Jobs site dropped RSS; JS-heavy results. |
+| Name                                  | Vertical | URL                                                                   | Why disabled                                                                        |
+| ------------------------------------- | -------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Rotherham United (Millers) — official | SPORTS   | `https://www.themillers.co.uk/news/`                                  | JS-rendered app, no SSR RSS. Covered meanwhile by the Advertiser + Star RUFC feeds. |
+| NHS Jobs — Rotherham                  | JOBS     | `https://www.jobs.nhs.uk/candidate/search/results?location=Rotherham` | New NHS Jobs site dropped RSS; JS-heavy results.                                    |
 
 **Explicitly excluded** (documented so we don't re-litigate): Rother FM (closed 2020),
 Redroad FM (abandoned since 2015), Magna / South Yorkshire Police / CV-Library (Cloudflare/WAF
@@ -174,7 +174,7 @@ orchestrates: fetch → normalize → dedup → persist → record the run.
   5. close the `IngestRun` (`SUCCESS`/`FAILED`) with `itemsFound`, `itemsNew`, `error?`, and a
      `stats` blob (dropped-as-irrelevant count, skipped-malformed count); update
      `Source.lastFetchedAt`.
-  Errors are caught per source so one bad feed never sinks the worker.
+     Errors are caught per source so one bad feed never sinks the worker.
 - **`scheduler.ts` + `boss.schedule`**: a single cron (e.g. every 5 min) runs a dispatcher that
   finds `enabled` sources whose `lastFetchedAt` is older than `fetchCadence` and enqueues one
   `ingest` job per source. Cadence lives in data, so tuning a source is a DB edit. (Cadence-per-
