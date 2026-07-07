@@ -21,15 +21,20 @@ layer is **provider-agnostic**. Mobile (Expo) comes later. Strict TypeScript (av
 `any`). Tests run through the project's `test` script; lint with ESLint, format with
 Prettier, type-check with `tsc --noEmit`.
 
-> **Status: Phase 0 done.** The pnpm + Turborepo monorepo is scaffolded:
-> `packages/db` (`@rovrum/db` — Prisma schema for the content model + first migration),
-> shared config in `packages/{tsconfig,eslint-config}`, and `infra/docker-compose.yml`
-> (Postgres + MinIO). The live holding page (`public/`, `vercel.json`) is still separate
-> and untouched — `apps/web` (Astro) is Phase 2. See `docs/ARCHITECTURE.md` for the full
-> plan and the target shape (`apps/{web,workers,mobile}`, `packages/{db,core,sources,ai,social}`).
+> **Status: Phase 1 (Ingestion) done.** On top of the Phase 0 monorepo:
+> `packages/core` (`@rovrum/core` — pure normalize / dedup-hash / Rotherham relevance),
+> `packages/sources` (`@rovrum/sources` — `SourceAdapter` + RSS & Cheerio HTML adapters +
+> the seeded source registry), and `apps/workers` (`@rovrum/workers` — the pg-boss
+> scheduler, ingest handler and `IngestRun` observability, containerised via
+> `infra/Dockerfile.workers`). 18 live Rotherham RSS sources ingest into `content_items`
+> with dedup and per-source relevance filtering. The two HTML sources are seeded-but-disabled
+> pending selector work (issue #9); Playwright sources (RUFC, NHS jobs) await Phase 1b. The
+> live holding page (`public/`, `vercel.json`) is untouched — `apps/web` (Astro) is Phase 2.
 >
 > **Local dev:** `docker compose -f infra/docker-compose.yml up -d`, copy `.env.example`
-> → `.env`, then `pnpm install && pnpm db:generate && pnpm db:migrate`. See `infra/README.md`.
+> → `.env`, then `pnpm install && pnpm db:generate && pnpm db:migrate`. Run the pipeline
+> with `pnpm --filter @rovrum/workers seed` then `pnpm --filter @rovrum/workers dev` (or the
+> `workers` compose service). See `infra/README.md` and `docs/plans/phase-1-ingestion.md`.
 
 ## Load-bearing principles
 
@@ -43,7 +48,7 @@ These shape the schema and the code. Don't change them without checking
   a canonical link; link out to the original. Never store or serve full third-party
   article content. This is the load-bearing legal boundary.
 - **Portable by default.** Everything runs as plain Docker containers. Any host is a
-  deploy *target*, never a dependency. No hard lock-in to a specific vendor's runtime.
+  deploy _target_, never a dependency. No hard lock-in to a specific vendor's runtime.
 - **One source-agnostic content model.** Every source adapter normalizes into the
   shared `content_item` shape (keep `raw` jsonb so we never lose original payload).
   The content model carries per-platform social variants (text/image/**video** for TikTok).
@@ -109,6 +114,6 @@ This project uses **GitHub**. Raise PRs with the `gh` CLI (or the REST API):
   end it with a `Manually reviewed by <name>` line confirming the diff was read.
 - Keep the `Co-Authored-By` trailer on commits. **A human merges** once CI is green
   and the diff has been reviewed against the plan.
-**Issue tracker: GitHub Issues.** One issue = one unit of work; acceptance criteria
-are the test contract. Reference the issue in the branch name and PR, and close it from
-the PR (`Closes #NN`) once merged.
+  **Issue tracker: GitHub Issues.** One issue = one unit of work; acceptance criteria
+  are the test contract. Reference the issue in the branch name and PR, and close it from
+  the PR (`Closes #NN`) once merged.

@@ -1,5 +1,5 @@
 {
-  "name": "@rovrum/db",
+  "name": "@rovrum/sources",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -12,24 +12,25 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc && node scripts/copy-engine.mjs",
+    "build": "tsc -p tsconfig.build.json",
     "check-types": "tsc --noEmit",
     "lint": "eslint .",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "test": "vitest run",
+    "verify:live": "tsx src/verify-live.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.2.0"
+    "@rovrum/core": "workspace:*",
+    "@rovrum/db": "workspace:*",
+    "cheerio": "^1.0.0",
+    "domhandler": "^5.0.3",
+    "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "@rovrum/eslint-config": "workspace:*",
     "@rovrum/tsconfig": "workspace:*",
-    "dotenv": "^16.4.7",
     "eslint": "^9.17.0",
-    "prisma": "^6.2.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   }
 }

@@ -1,0 +1,25 @@
+# Keep the build context lean and reproducible — installs happen in the image.
+**/node_modules
+**/dist
+**/.turbo
+*.tsbuildinfo
+
+# Generated in-image via `prisma generate` (and it'd be the wrong-arch engine).
+packages/db/src/generated
+
+# Local state, secrets, VCS, tooling.
+docker-data
+.git
+.github
+.env
+.env.*
+!.env.example
+.vercel
+.expo
+coverage
+**/*.log
+
+# Not needed to build/run the worker.
+public
+brand
+docs

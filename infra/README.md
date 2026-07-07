@@ -3,8 +3,10 @@
 Local dev services for Rovrum, as plain Docker containers (portable — any host is a
 deploy _target_, never a dependency).
 
-- **Postgres 16** — primary database and the pg-boss job queue (later phases).
+- **Postgres 16** — primary database and the pg-boss job queue.
 - **MinIO** — S3-compatible object storage, standing in for Cloudflare R2 locally.
+- **workers** — the ingestion worker (`apps/workers`), built from `Dockerfile.workers`.
+  Runs `prisma migrate deploy` on boot, then the pg-boss scheduler + ingest workers.
 
 ## Bring it up
 
@@ -32,4 +34,27 @@ Then from the repo root:
 pnpm db:generate     # generate the Prisma client
 pnpm db:migrate      # apply migrations (first run creates the schema)
 pnpm db:studio       # browse data in Prisma Studio
+```
+
+## Run the ingestion pipeline
+
+Two ways:
+
+**In containers (portability check — the whole pipeline in Docker):**
+
+```bash
+docker compose -f infra/docker-compose.yml up -d postgres workers
+pnpm --filter @rovrum/workers seed   # one-time: populate the source registry
+docker compose -f infra/docker-compose.yml logs -f workers
+```
+
+The `workers` container applies migrations on boot, then the dispatcher enqueues
+due sources and ingest workers fill `content_items`. Watch it in Prisma Studio.
+
+**On the host (for development / faster iteration):**
+
+```bash
+docker compose -f infra/docker-compose.yml up -d postgres
+pnpm db:migrate && pnpm --filter @rovrum/workers seed
+pnpm --filter @rovrum/workers dev    # tsx watch; Ctrl-C to stop
 ```
