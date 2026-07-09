@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { SEED_SOURCES } from "./seed-data.js";
 
 describe("SEED_SOURCES", () => {
-  it("has the expected shape: 22 sources, 20 enabled, 2 disabled", () => {
+  it("has the expected shape: 22 sources, all enabled", () => {
     expect(SEED_SOURCES).toHaveLength(22);
-    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(20);
-    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(2);
+    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(22);
+    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(0);
   });
 
   it("has unique URLs (upsert key must not collide)", () => {
@@ -33,22 +33,38 @@ describe("SEED_SOURCES", () => {
     }
   });
 
-  it("disables only the JS-rendered sources that need Playwright (Phase 1b)", () => {
-    const disabled = SEED_SOURCES.filter((s) => !s.enabled).map((s) => s.name);
-    expect(disabled).toEqual([
+  it("gives every PLAYWRIGHT source a waitFor + item/title/link selectors", () => {
+    for (const s of SEED_SOURCES.filter((s) => s.type === "PLAYWRIGHT")) {
+      expect(s.config?.playwright?.waitFor, s.name).toBeTruthy();
+      expect(s.config?.selectors?.item, s.name).toBeTruthy();
+      expect(s.config?.selectors?.title, s.name).toBeTruthy();
+      expect(s.config?.selectors?.link, s.name).toBeTruthy();
+    }
+  });
+
+  it("marks the two JS-rendered sources as PLAYWRIGHT", () => {
+    const pw = SEED_SOURCES.filter((s) => s.type === "PLAYWRIGHT").map((s) => s.name);
+    expect(pw.sort()).toEqual([
       "Rotherham MBC — Jobs",
       "Rotherham United (Millers) — official",
     ]);
   });
 
-  it("enabled non-RSS sources are the JSON-LD Eventbrite + the Cheerio NHS Jobs source", () => {
+  it("only the linkless iTrent portal uses linkFallbackToSource", () => {
+    const fallback = SEED_SOURCES.filter((s) => s.config?.playwright?.linkFallbackToSource).map(
+      (s) => s.name,
+    );
+    expect(fallback).toEqual(["Rotherham MBC — Jobs"]);
+  });
+
+  it("enabled non-RSS sources: Eventbrite (jsonLd) + NHS (Cheerio) + 2 Playwright", () => {
     const nonRss = SEED_SOURCES.filter((s) => s.enabled && s.type !== "RSS");
     expect(nonRss.map((s) => s.name).sort()).toEqual([
       "Eventbrite — Rotherham",
       "NHS Jobs — Rotherham",
+      "Rotherham MBC — Jobs",
+      "Rotherham United (Millers) — official",
     ]);
-    // Both are HTML: Eventbrite via jsonLd, NHS via CSS selectors.
-    expect(nonRss.every((s) => s.type === "HTML")).toBe(true);
   });
 
   it("covers all four verticals", () => {

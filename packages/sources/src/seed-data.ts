@@ -228,27 +228,55 @@ export const SEED_SOURCES: SeedSource[] = [
     },
   },
 
-  // ── Seeded but disabled — need Playwright (Phase 1b) ─────────────────────
-  // Genuinely JS-rendered; wait on the Playwright adapter (re-typed to PLAYWRIGHT
-  // when it lands). Investigated live 2026-07-09:
-  // - iTrent: `rotherham.gov.uk/jobs` is a hub; real vacancies are on this
-  //   session-bound WebiTrent app shell (POST-driven results, "show more").
-  // - Millers: client-rendered Nuxt; the news API is AWS-Cognito-gated (spike hit
-  //   401), so there's no clean unauthenticated JSON path — scrape the rendered DOM.
-  {
-    name: "Rotherham MBC — Jobs",
-    type: "HTML",
-    url: "https://ce0351li.webitrent.com/ce0351li_webrecruitment/wrd/run/ETREC179GF.open?WVID=70298800Qz",
-    vertical: "JOBS",
-    fetchCadence: JOBS,
-    enabled: false,
-  },
+  // ── Playwright (JS-rendered) — recipes confirmed against the live DOM 2026-07-09 ──
+  // Millers: client-rendered Nuxt; the news API is AWS-Cognito-gated (spike hit 401),
+  // so scrape the rendered DOM. `a.news-article` cards, `h3` titles, real per-article
+  // URLs on the card anchor itself.
   {
     name: "Rotherham United (Millers) — official",
-    type: "HTML",
+    type: "PLAYWRIGHT",
     url: "https://www.themillers.co.uk/news/",
     vertical: "SPORTS",
     fetchCadence: NEWS,
-    enabled: false,
+    enabled: true,
+    config: {
+      playwright: {
+        waitFor: "a.news-article",
+        // The hero card renders first (~1s); the rest hydrate by ~3s.
+        settleMs: 4000,
+        consentClick: "#onetrust-accept-btn-handler",
+      },
+      selectors: {
+        item: "a.news-article", // the card is itself the anchor
+        title: "h3",
+        link: "a.news-article",
+      },
+    },
+  },
+  // iTrent (WebiTrent): `rotherham.gov.uk/jobs` is a hub; real vacancies render on
+  // this portal, but it exposes NO stable per-vacancy URL (links are
+  // javascript:void(0), results come from session-bound JSON). Decision: ingest
+  // anyway, linking every job to the search-results page (linkFallbackToSource).
+  // Trade-off: all iTrent jobs share one canonical link → title-only dedup.
+  {
+    name: "Rotherham MBC — Jobs",
+    type: "PLAYWRIGHT",
+    url: "https://ce0351li.webitrent.com/ce0351li_webrecruitment/wrd/run/ETREC179GF.open?WVID=70298800Qz",
+    vertical: "JOBS",
+    fetchCadence: JOBS,
+    enabled: true,
+    config: {
+      playwright: {
+        waitFor: ".Mhr-jobDetailTitleContainer",
+        linkFallbackToSource: true,
+      },
+      selectors: {
+        item: ".Mhr-jobDetailTitleContainer",
+        // The anchor has a visible title span + an aria-hidden " Job profile" span;
+        // target the first span so the suffix doesn't bleed into the title.
+        title: "a.Mhr-jobDetailTitleLink span:first-child",
+        link: "a.Mhr-jobDetailTitleLink",
+      },
+    },
   },
 ];

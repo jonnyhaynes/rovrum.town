@@ -45,6 +45,12 @@ export interface SourceConfig {
 export interface PlaywrightConfig {
   /** Selector to wait for before scraping (the list must have hydrated). */
   waitFor: string;
+  /**
+   * Extra settle time (ms) after `waitFor` matches, before scraping. Some apps
+   * render the first item early then hydrate the rest — waiting for one match
+   * would scrape a partial list. Defaults to 0.
+   */
+  settleMs?: number;
   /** Optional selector to click once to dismiss a cookie/consent banner. */
   consentClick?: string;
   /** Optional "load more"/pagination selector, clicked repeatedly (bounded). */
@@ -53,6 +59,13 @@ export interface PlaywrightConfig {
   showMoreLimit?: number;
   /** Optional ordered pre-scrape actions (e.g. iTrent: select region, submit). */
   steps?: PlaywrightStep[];
+  /**
+   * When true, items whose link selector yields no usable href fall back to the
+   * source (page) URL as their canonical link, instead of being dropped. For portals
+   * (e.g. iTrent) that render real items but expose no per-item URL — accepted with
+   * the trade-off that all such items share one link. Off by default.
+   */
+  linkFallbackToSource?: boolean;
 }
 
 /** A single typed pre-scrape action. Not arbitrary code — a small fixed vocabulary. */

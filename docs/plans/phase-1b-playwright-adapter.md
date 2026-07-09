@@ -97,6 +97,24 @@ browser in the container — is justified by two sources, not hypothetically by 
   inject a stub/`chromium` as needed. No browser is launched for RSS/HTML sources.
 - Extend `registry.getAdapter` to return `PlaywrightAdapter` for the new type.
 
+#### Rendered-DOM recon findings (2026-07-09, live browser)
+- **Millers:** clean. Item `a.news-article` (17 cards), title `h3`, the card *is* the
+  anchor (`/news/YYYY/month/DD/slug/` — real per-article URLs). `waitFor: a.news-article`;
+  dismiss OneTrust consent if present. Rendered fixture captured for a CI test.
+- **iTrent:** vacancies render on load (real jobs), BUT the deep probe found **no stable
+  per-vacancy URL** — job links are `javascript:void(0)`, no job id / data-attr, the URL
+  never changes on click, and results come from **session-bound JSON** (`etrecNNN.json?...
+  &USESSION=<token>`). **Decision (locked): ingest anyway, using the search-results page
+  URL as each item's `canonicalUrl`.** Trade-off accepted: all iTrent jobs link to the
+  same generic listing (weak per-item linking).
+  - **Dedup consequence:** `contentHash = sha256(canonicalUrl + title)`; with a shared URL
+    this degrades to title-only dedup. Fine in practice (titles are distinct), but two
+    distinct jobs with an identical title would collide and one be dropped — an accepted
+    edge case, documented here.
+  - iTrent recipe: item = the job-title container (`.Mhr-jobDetailTitleContainer`), title =
+    `a.Mhr-jobDetailTitleLink`, link selector unused → the adapter falls back to the source
+    URL when a row has no usable href.
+
 ### 3. Schema: new `PLAYWRIGHT` source type (`packages/db`)
 - Add `PLAYWRIGHT` to the `SourceType` enum. Hand-authored migration (Prisma
   `migrate dev` needs an interactive TTY we don't have — same approach as Phase 1's

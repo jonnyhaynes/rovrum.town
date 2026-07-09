@@ -57,7 +57,7 @@ export class PlaywrightAdapter implements SourceAdapter {
     try {
       const page = await context.newPage();
       const html = await this.render(page, source.url, pw);
-      return extractCards(html, source.url, selectors);
+      return extractCards(html, source.url, selectors, pw.linkFallbackToSource ?? false);
     } finally {
       await context.close();
       if (ownBrowser) await ownBrowser.close();
@@ -79,6 +79,8 @@ export class PlaywrightAdapter implements SourceAdapter {
     }
 
     await page.waitForSelector(pw.waitFor, { timeout: NAV_TIMEOUT_MS });
+    // Some apps render the first item early then hydrate the rest.
+    if (pw.settleMs) await page.waitForTimeout(pw.settleMs);
 
     if (pw.showMore) {
       const limit = pw.showMoreLimit ?? DEFAULT_SHOW_MORE_LIMIT;
@@ -118,14 +120,23 @@ function extractCards(
   html: string,
   baseUrl: string,
   selectors: HtmlSelectors,
+  linkFallbackToSource: boolean,
 ): FetchedItem[] {
   const $ = cheerio.load(html);
   const items: FetchedItem[] = [];
   $(selectors.item).each((_, el) => {
-    const item = extractItem($, $(el), selectors, baseUrl);
+    const item = extractItem($, $(el), selectors, baseUrl, linkFallbackToSource);
     if (item) items.push(item);
   });
   return items;
+}
+
+/** A usable outbound href — not empty, not a `javascript:`/`#` placeholder. */
+function usableHref(href: string | undefined): string | undefined {
+  if (!href) return undefined;
+  const h = href.trim();
+  if (!h || h === "#" || h.toLowerCase().startsWith("javascript:")) return undefined;
+  return h;
 }
 
 function extractItem(
@@ -133,12 +144,15 @@ function extractItem(
   $el: Cheerio<AnyNode>,
   selectors: HtmlSelectors,
   baseUrl: string,
+  linkFallbackToSource: boolean,
 ): FetchedItem | null {
   const title = $el.find(selectors.title).first().text().trim();
   const href =
-    $el.find(selectors.link).first().attr("href") ??
+    usableHref($el.find(selectors.link).first().attr("href")) ??
     // The item container itself may be the anchor.
-    ($el.is("a") ? $el.attr("href") : undefined);
+    ($el.is("a") ? usableHref($el.attr("href")) : undefined) ??
+    // Portals that expose no per-item URL fall back to the page URL, if allowed.
+    (linkFallbackToSource ? baseUrl : undefined);
   if (!title || !href) return null;
 
   const summary = selectors.excerpt

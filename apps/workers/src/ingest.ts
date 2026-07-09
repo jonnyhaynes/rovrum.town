@@ -1,5 +1,6 @@
 import { normalize, isRotherhamRelevant, type NormalizedItem } from "@rovrum/core";
 import { getAdapter, type AdapterSource, type FetchDeps } from "@rovrum/sources";
+import type { Browser } from "playwright";
 import type { PrismaClient, Source } from "@rovrum/db";
 
 export interface IngestDeps {
@@ -8,6 +9,11 @@ export interface IngestDeps {
   getAdapter?: typeof getAdapter;
   /** Fetch options passed to adapters (User-Agent, test fetch impl). */
   fetchDeps?: FetchDeps;
+  /**
+   * Resolves the shared Playwright browser — invoked lazily, and only for
+   * PLAYWRIGHT sources, so RSS/HTML ingests never launch Chromium.
+   */
+  getBrowser?: () => Promise<Browser>;
 }
 
 export interface IngestResult {
@@ -32,7 +38,13 @@ export async function runIngest(deps: IngestDeps, sourceId: string): Promise<Ing
 
   try {
     const source = await prisma.source.findUniqueOrThrow({ where: { id: sourceId } });
-    const adapter = adapterFactory(source.type, deps.fetchDeps);
+
+    // Playwright sources get the shared browser (launched lazily on first need).
+    let fetchDeps = deps.fetchDeps;
+    if (source.type === "PLAYWRIGHT" && deps.getBrowser) {
+      fetchDeps = { ...fetchDeps, browser: await deps.getBrowser() };
+    }
+    const adapter = adapterFactory(source.type, fetchDeps);
 
     const fetched = await adapter.fetch(toAdapterSource(source));
     const regional = isRegional(source);

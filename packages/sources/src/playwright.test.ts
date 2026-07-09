@@ -104,6 +104,53 @@ describe("PlaywrightAdapter (stubbed browser)", () => {
     expect(context.close).toHaveBeenCalledOnce();
   });
 
+  it("falls back to the source URL when items have no usable href (iTrent)", async () => {
+    // iTrent-shaped rows: real titles, but the link is javascript:void(0).
+    const itrentHtml = `<!doctype html><html><body>
+      <div class="Mhr-jobDetailTitleContainer">
+        <a href="javascript:void(0);" class="Mhr-jobDetailTitleLink"><span>Technical Assistant</span></a>
+      </div>
+      <div class="Mhr-jobDetailTitleContainer">
+        <a href="javascript:void(0);" class="Mhr-jobDetailTitleLink"><span>Ranger</span></a>
+      </div>
+    </body></html>`;
+    const { browser } = stubBrowser(itrentHtml);
+    const itrentSource: AdapterSource = {
+      id: "src_itrent",
+      type: "PLAYWRIGHT",
+      url: "https://ce0351li.webitrent.com/.../ETREC179GF.open?WVID=x",
+      config: {
+        playwright: { waitFor: ".Mhr-jobDetailTitleContainer", linkFallbackToSource: true },
+        selectors: {
+          item: ".Mhr-jobDetailTitleContainer",
+          title: "a.Mhr-jobDetailTitleLink",
+          link: "a.Mhr-jobDetailTitleLink",
+        },
+      },
+    };
+    const items = await new PlaywrightAdapter({ browser }).fetch(itrentSource);
+
+    expect(items.map((i) => i.title)).toEqual(["Technical Assistant", "Ranger"]);
+    // Both fall back to the (shared) search-page URL — no javascript: link stored.
+    expect(items.every((i) => i.link === itrentSource.url)).toBe(true);
+  });
+
+  it("drops items with no usable href when fallback is OFF", async () => {
+    const html = `<div class="c"><a class="t" href="javascript:void(0);">Only title</a></div>`;
+    const { browser } = stubBrowser(`<!doctype html><html><body>${html}</body></html>`);
+    const src: AdapterSource = {
+      id: "s",
+      type: "PLAYWRIGHT",
+      url: "https://x.test",
+      config: {
+        playwright: { waitFor: ".c" }, // linkFallbackToSource defaults false
+        selectors: { item: ".c", title: ".t", link: ".t" },
+      },
+    };
+    const items = await new PlaywrightAdapter({ browser }).fetch(src);
+    expect(items).toEqual([]);
+  });
+
   it("throws when waitFor / selectors are missing", async () => {
     const { browser } = stubBrowser(RENDERED_HTML);
     const adapter = new PlaywrightAdapter({ browser });
