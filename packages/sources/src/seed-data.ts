@@ -4,7 +4,7 @@ import type { SourceConfig } from "./adapter.js";
 /** A source to seed into the `sources` registry. Matches the DB `Source` model. */
 export interface SeedSource {
   name: string;
-  type: "RSS" | "HTML";
+  type: "RSS" | "HTML" | "PLAYWRIGHT";
   url: string;
   vertical: "NEWS" | "SPORTS" | "EVENTS" | "JOBS";
   /** Fetch cadence in minutes. */

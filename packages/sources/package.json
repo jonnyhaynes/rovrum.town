@@ -23,6 +23,7 @@
     "@rovrum/db": "workspace:*",
     "cheerio": "^1.0.0",
     "domhandler": "^5.0.3",
+    "playwright": "1.61.1",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {

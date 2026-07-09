@@ -1,9 +1,9 @@
-import type { FetchDeps, SourceAdapter } from "./adapter.js";
+import type { FetchDeps, SourceAdapter, SourceType } from "./adapter.js";
 import { RssAdapter } from "./rss.js";
 import { HtmlAdapter } from "./html.js";
 
 /** Select the adapter for a source `type`. API is not implemented this phase. */
-export function getAdapter(type: "RSS" | "HTML" | "API", deps?: FetchDeps): SourceAdapter {
+export function getAdapter(type: SourceType, deps?: FetchDeps): SourceAdapter {
   switch (type) {
     case "RSS":
       return new RssAdapter(deps);
