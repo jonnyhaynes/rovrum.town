@@ -8,7 +8,10 @@
 FROM node:22-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
-# OpenSSL is required by Prisma's query engine at runtime.
+# Install the Chromium browser + its OS libraries to a FIXED, shared location (not
+# the default ~/.cache), so the runtime stage can copy it and both stages agree via
+# PLAYWRIGHT_BROWSERS_PATH. OpenSSL is required by Prisma's query engine at runtime.
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 RUN apt-get update && apt-get install -y --no-install-recommends openssl \
   && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
@@ -38,6 +41,11 @@ COPY apps/workers apps/workers
 RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter @rovrum/db db:generate \
   && pnpm --filter @rovrum/db --filter @rovrum/core --filter @rovrum/sources --filter @rovrum/workers build
 
+# Download the Chromium browser into PLAYWRIGHT_BROWSERS_PATH (/ms-playwright).
+# The pinned `playwright` version must match this browser build — we pin the npm
+# package exactly (1.61.1) so they never drift.
+RUN pnpm --filter @rovrum/sources exec playwright install chromium
+
 # Prune to production dependencies only (drops dev deps like typescript/vitest).
 RUN pnpm --filter @rovrum/workers deploy --prod --legacy /app/deploy
 
@@ -50,10 +58,19 @@ COPY --from=builder /app/deploy/node_modules ./node_modules
 COPY --from=builder /app/deploy/dist ./dist
 # Prisma needs the schema + migrations on disk to run `migrate deploy` at boot.
 COPY --from=builder /app/packages/db/prisma ./prisma
+# The Chromium browser binary (downloaded to the fixed PLAYWRIGHT_BROWSERS_PATH in
+# the builder) — the prod prune only carries node_modules, so copy it explicitly.
+COPY --from=builder /ms-playwright /ms-playwright
+# Chromium's shared libraries (fonts, X/GTK libs, etc.) into this runtime image.
+# `install-deps` reads the browser under node_modules and apt-installs what it needs.
+RUN node node_modules/playwright/cli.js install-deps chromium \
+  && rm -rf /var/lib/apt/lists/*
 COPY infra/entrypoint.workers.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Run as the non-root user the node image ships with.
+# Run as the non-root user the node image ships with. Chromium runs headless with
+# --no-sandbox (Playwright's default when chromiumSandbox isn't enabled) — fine here
+# since the worker only visits known, trusted source sites in an isolated container.
 USER node
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["node", "dist/index.js"]

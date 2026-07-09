@@ -49,6 +49,9 @@ services:
       context: ..
       dockerfile: infra/Dockerfile.workers
     restart: unless-stopped
+    # Chromium (Playwright) crashes with the default 64MB /dev/shm; share the host
+    # IPC namespace so it uses host shared memory. See Playwright's Docker guide.
+    ipc: host
     depends_on:
       postgres:
         condition: service_healthy
