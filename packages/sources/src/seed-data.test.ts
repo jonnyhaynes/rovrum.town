@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { SEED_SOURCES } from "./seed-data.js";
 
 describe("SEED_SOURCES", () => {
-  it("has the expected shape: 22 sources, 18 enabled, 4 disabled", () => {
+  it("has the expected shape: 22 sources, 19 enabled, 3 disabled", () => {
     expect(SEED_SOURCES).toHaveLength(22);
-    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(18);
-    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(4);
+    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(19);
+    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(3);
   });
 
   it("has unique URLs (upsert key must not collide)", () => {
@@ -14,31 +14,38 @@ describe("SEED_SOURCES", () => {
   });
 
   it("marks exactly the three regional feeds", () => {
+    // Eventbrite is scoped by structured locality (config.localityAllow), NOT the
+    // keyword `regional` filter — that would drop generically-titled local events.
     const regional = SEED_SOURCES.filter((s) => s.config?.regional).map((s) => s.name);
     expect(regional).toEqual(["The Star — News", "The Star — Sport", "BBC News — South Yorkshire"]);
   });
 
-  it("gives every HTML source item/title/link selectors (else it can't scrape)", () => {
+  it("gives every enabled HTML source a workable extraction strategy", () => {
     for (const s of SEED_SOURCES.filter((s) => s.type === "HTML" && s.enabled)) {
-      expect(s.config?.selectors, s.name).toBeDefined();
-      expect(s.config?.selectors?.item, s.name).toBeTruthy();
-      expect(s.config?.selectors?.title, s.name).toBeTruthy();
-      expect(s.config?.selectors?.link, s.name).toBeTruthy();
+      if (s.config?.strategy === "jsonLd") {
+        // JSON-LD sources need no CSS selectors; a locality filter is expected here.
+        expect(s.config?.localityAllow?.length, s.name).toBeGreaterThan(0);
+      } else {
+        expect(s.config?.selectors?.item, s.name).toBeTruthy();
+        expect(s.config?.selectors?.title, s.name).toBeTruthy();
+        expect(s.config?.selectors?.link, s.name).toBeTruthy();
+      }
     }
   });
 
-  it("disables the sources not yet fit to serve (HTML selector work + Playwright)", () => {
+  it("disables only the JS-rendered sources that need Playwright (Phase 1b)", () => {
     const disabled = SEED_SOURCES.filter((s) => !s.enabled).map((s) => s.name);
     expect(disabled).toEqual([
       "Rotherham MBC — Jobs",
-      "Eventbrite — Rotherham",
       "Rotherham United (Millers) — official",
       "NHS Jobs — Rotherham",
     ]);
   });
 
-  it("all enabled sources are RSS this phase (HTML scrapers disabled pending fixes)", () => {
-    expect(SEED_SOURCES.filter((s) => s.enabled).every((s) => s.type === "RSS")).toBe(true);
+  it("all enabled sources are RSS, except the JSON-LD Eventbrite source", () => {
+    const nonRss = SEED_SOURCES.filter((s) => s.enabled && s.type !== "RSS");
+    expect(nonRss.map((s) => s.name)).toEqual(["Eventbrite — Rotherham"]);
+    expect(nonRss.every((s) => s.config?.strategy === "jsonLd")).toBe(true);
   });
 
   it("covers all four verticals", () => {

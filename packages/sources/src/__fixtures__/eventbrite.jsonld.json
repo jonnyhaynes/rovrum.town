@@ -1,0 +1,646 @@
+{
+  "@context": "https://schema.org",
+  "itemListElement": [
+    {
+      "position": 1,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-09",
+        "endDate": "2026-07-09",
+        "description": "For parent/carers with a child or young person who may have additional needs and/or disabilities (no diagnosis required)",
+        "url": "https://www.eventbrite.com/e/send-connect-evening-meet-up-tickets-1990108324571",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1185142443%2F3002835632293%2F1%2Foriginal.png?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C940%2C470&s=3331101b5709e900a63326589e4e884c",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "45 Moorgate Street",
+            "postalCode": "S60 2RB",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4285007",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3558882"
+          },
+          "@type": "Place",
+          "name": "Eric Manns Building"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "SEND Connect Evening Meet-Up"
+      }
+    },
+    {
+      "position": 2,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-09",
+        "endDate": "2026-07-09",
+        "description": "Join the Titans Community Foundation Youth Club for an action-packed day of games, workshops, and fun surprises, great for u16s",
+        "url": "https://www.eventbrite.co.uk/e/titans-community-foundation-youth-club-tickets-1990205745961",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1132531103%2F2890107786641%2F1%2Foriginal.20250923-115021?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C500%2C6000%2C3000&s=510f82d8f49b44bcf58cfba91a8ea761",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Broom Road",
+            "postalCode": "S60 2SN",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4253089",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3432173"
+          },
+          "@type": "Place",
+          "name": "S60 2SN"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Titans Community Foundation Youth Club"
+      }
+    },
+    {
+      "position": 3,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-10",
+        "endDate": "2026-07-10",
+        "description": "Join us for a relaxed and welcoming yoga practice, suitable for all abilities and ideal to prepare you for the weekend.",
+        "url": "https://www.eventbrite.com/e/the-brecks-hub-yoga-for-mobility-and-mind-tickets-1991897417797",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1178890191%2F1342230329203%2F1%2Foriginal.20260303-112713?w=266&auto=format%2Ccompress&q=75&sharp=10&s=7b72c2367be2a19832d5b8f0bd344047",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Brecks Crescent",
+            "postalCode": "S65 3HU",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4240956",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.303339"
+          },
+          "@type": "Place",
+          "name": "Brecks Community Hub"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "The Brecks Hub: Yoga for Mobility and Mind"
+      }
+    },
+    {
+      "position": 4,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-14",
+        "endDate": "2026-07-14",
+        "description": "Gain skills to improve environmental management, apply ISO standards effectively, audit compliance, and drive sustainable results.",
+        "url": "https://www.eventbrite.co.uk/e/opex-iso-140012026-fourth-edition-implementation-workshop-tickets-1991349105781",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1186383085%2F241160731387%2F1%2Foriginal.20260608-083608?crop=focalpoint&fit=crop&h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=6db20446e940756ab2742042e7ac7529",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "New York Way",
+            "postalCode": "S60 1FJ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.42686759999999",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3624572"
+          },
+          "@type": "Place",
+          "name": "AESSEAL New York Stadium"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "OPEX \u2013 ISO 14001:2026 (Fourth Edition) Implementation Workshop"
+      }
+    },
+    {
+      "position": 5,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-23",
+        "endDate": "2026-07-23",
+        "description": "Step into the archives, uncover stories and bring them to life through shadow puppetry and storytelling!",
+        "url": "https://www.eventbrite.co.uk/e/the-unwritten-chapter-stories-found-in-light-and-shadow-tickets-1992690641350",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1187761767%2F519701233291%2F1%2Foriginal.20260627-140703?crop=focalpoint&fit=crop&h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=b28a8010e356d49d2ecd64118675ec36",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Ship Hill",
+            "postalCode": "S60 2HG",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4286845",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.356259"
+          },
+          "@type": "Place",
+          "name": "Grimm & Co"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "The Unwritten Chapter: Stories Found In Light And Shadow"
+      }
+    },
+    {
+      "position": 6,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-25",
+        "endDate": "2026-07-25",
+        "description": "Get ready to rock as John White channels Elvis live in person for a night of classic hits and good vibes!",
+        "url": "https://www.eventbrite.com/e/john-white-as-elvis-tickets-1980513361779",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174790033%2F2988648425184%2F1%2Foriginal.20260113-230708?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C4%2C780%2C390&s=c789540fa9daf05e4d59e8f52dc1afd1",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Brinsworth",
+            "addressRegion": "England",
+            "streetAddress": "Whitehill Road",
+            "postalCode": "S60 5JQ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4019398",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3633236"
+          },
+          "@type": "Place",
+          "name": "The Yorkshire Terrier"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "John White as Elvis"
+      }
+    },
+    {
+      "position": 7,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-09-17",
+        "endDate": "2026-09-17",
+        "description": "The Chamber Means Business Expo is the must attend event for businesses looking to grow their network and expand their business.",
+        "url": "https://www.eventbrite.co.uk/e/chamber-means-business-expo-2026-tickets-1985797232980",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1180546597%2F594231011163%2F1%2Foriginal.20260324-100742?w=422&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C67%2C422%2C211&s=aa15379f35b230c3b31e9a72f4986b90",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "South Yorkshire",
+            "streetAddress": "New York Way",
+            "postalCode": "S60 1FJ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4276861",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.363184"
+          },
+          "@type": "Place",
+          "name": "AESSEAL New York Stadium"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Chamber Means Business Expo 2026"
+      }
+    },
+    {
+      "position": 8,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-09-20",
+        "endDate": "2026-09-20",
+        "description": "Book an appointment to bring your archaeological finds for identification and recording.",
+        "url": "https://www.eventbrite.co.uk/e/pas-finds-surgery-clifton-park-museum-rotherham-sun-20th-sep-2026-tickets-1985712972956",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F648697169%2F229464999370%2F1%2Foriginal.20231127-135728?h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&s=36e6561eeb6807f664d2436038f3a921",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Clifton Lane",
+            "postalCode": "S65 2AA",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.43121300000001",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3491722"
+          },
+          "@type": "Place",
+          "name": "Clifton Park & Museum"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "PAS Finds Surgery - Clifton Park Museum, Rotherham, Sun 20th Sep 2026"
+      }
+    },
+    {
+      "position": 9,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-09",
+        "endDate": "2026-07-09",
+        "description": "Join us online to get the scoop on 2026 Think Academy US Online recruitment and how to apply!",
+        "url": "https://www.eventbrite.com/e/2026-think-academy-us-online-ela-recruitment-information-session-tickets-1992514434310",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1187592805%2F346759564847%2F1%2Foriginal.20260624-202622?w=300&auto=format%2Ccompress&q=75&sharp=10&s=369d054d260cb2303bcafbfad9180fde",
+        "location": {
+          "url": "https://www.eventbrite.com/e/2026-think-academy-us-online-ela-recruitment-information-session-tickets-1992514434310",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "2026 Think Academy US Online ELA Recruitment Information Session"
+      }
+    },
+    {
+      "position": 10,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-09",
+        "endDate": "2026-07-09",
+        "description": "You're not stuck because something's wrong with you. You're stuck because nobody shared the hidden rule running your life. Let's fix that!",
+        "url": "https://www.eventbrite.com/e/from-stuck-to-momentum-why-smart-caring-people-still-feel-helpless-tickets-1992453841074",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1187511895%2F299421429343%2F1%2Foriginal.20260623-202020?w=400&auto=format%2Ccompress&q=75&sharp=10&s=f0a3441cbdb0133085303d7405f105ee",
+        "location": {
+          "url": "https://www.eventbrite.com/e/from-stuck-to-momentum-why-smart-caring-people-still-feel-helpless-tickets-1992453841074",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "From Stuck to Momentum: Why Smart Caring People Still Feel Helpless"
+      }
+    },
+    {
+      "position": 11,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-14",
+        "endDate": "2026-07-14",
+        "description": "Part of the Brunel New Writers Programme",
+        "url": "https://www.eventbrite.co.uk/e/anatomy-of-a-story-with-lucy-caldwell-tickets-1989013934220",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1184021201%2F44194440610%2F1%2Foriginal.20260507-142104?crop=focalpoint&fit=crop&w=512&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.527&fp-y=0.416&s=be80ed7e7cc6e8ea19ca3a67dd250799",
+        "location": {
+          "url": "https://www.eventbrite.co.uk/e/anatomy-of-a-story-with-lucy-caldwell-tickets-1989013934220",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Anatomy of a Story with Lucy Caldwell"
+      }
+    },
+    {
+      "position": 12,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-14",
+        "endDate": "2026-07-14",
+        "description": "This workshop will help you prepare for the Alberta Police Cognitive Ability Test (APCAT).",
+        "url": "https://www.eventbrite.ca/e/virtual-written-testing-apcat-workshop-tickets-1985472844726",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1180180452%2F2189778777153%2F1%2Foriginal.20240624-195702?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C0%2C2048%2C1024&s=f2fc4b67fb80bad1d6d4abff12b0b020",
+        "location": {
+          "url": "https://www.eventbrite.ca/e/virtual-written-testing-apcat-workshop-tickets-1985472844726",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Virtual Written Testing (APCAT) Workshop"
+      }
+    },
+    {
+      "position": 13,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-18",
+        "endDate": "2026-07-18",
+        "description": "How interoception and mindfulness can support autistic people in recognising anxiety and developing effective strategies for emotional regul",
+        "url": "https://www.eventbrite.co.uk/e/understanding-anxiety-in-autism-the-role-of-interoception-and-mindfulness-tickets-1671999157489",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1116843623%2F333591378297%2F1%2Foriginal.20250907-204121?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C60%2C1920%2C960&s=5371e34c2153b98f74b1f2c81639c721",
+        "location": {
+          "url": "https://www.eventbrite.co.uk/e/understanding-anxiety-in-autism-the-role-of-interoception-and-mindfulness-tickets-1671999157489",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Understanding Anxiety in Autism - The role of Interoception and Mindfulness"
+      }
+    },
+    {
+      "position": 14,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-23",
+        "endDate": "2026-07-24",
+        "description": "Join us to explore how, when, and why adaptations of mind and body interventions may be warranted to improve health and well-being.",
+        "url": "https://www.eventbrite.com/e/maximizing-the-impact-of-mind-and-body-interventions-using-adaptation-tickets-1984562662346",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1179405788%2F296067803145%2F1%2Foriginal.20260309-173754?crop=focalpoint&fit=crop&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=aa6857a2919d0b99da62af496d889289",
+        "location": {
+          "url": "https://www.eventbrite.com/e/maximizing-the-impact-of-mind-and-body-interventions-using-adaptation-tickets-1984562662346",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Maximizing the Impact of Mind and Body Interventions Using Adaptation"
+      }
+    },
+    {
+      "position": 15,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-23",
+        "endDate": "2026-07-23",
+        "description": "Plan Partners: Webinar | Implementing NDIS reform with confidence, from setting goals to what\u2019s reasonable and necessary",
+        "url": "https://www.eventbrite.com.au/e/plan-partners-webinar-implementing-ndis-reform-with-confidence-tickets-1989804932116",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1187170944%2F2827393135741%2F1%2Foriginal.20260618-042859?crop=focalpoint&fit=crop&w=422&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.079&fp-y=0.585&s=484a06b641f801cf886ad8ee1d9b4cda",
+        "location": {
+          "url": "https://www.eventbrite.com.au/e/plan-partners-webinar-implementing-ndis-reform-with-confidence-tickets-1989804932116",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Plan Partners: Webinar | Implementing NDIS reform with confidence"
+      }
+    },
+    {
+      "position": 16,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-08-30",
+        "endDate": "2026-08-30",
+        "description": "Join NASA to Participate Online in the Launch of the Nancy Grace Roman Space Telescope",
+        "url": "https://www.eventbrite.com/e/nasas-nancy-grace-roman-space-telescope-launch-tickets-1983457247019",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1183156992%2F977011528923%2F1%2Foriginal.20260427-192635?crop=focalpoint&fit=crop&h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.496&fp-y=0.498&s=e94f76f9d742189772b326d7db3f9e7f",
+        "location": {
+          "url": "https://www.eventbrite.com/e/nasas-nancy-grace-roman-space-telescope-launch-tickets-1983457247019",
+          "@type": "VirtualLocation"
+        },
+        "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+        "@type": "Event",
+        "name": "NASA's Nancy Grace Roman Space Telescope Launch"
+      }
+    },
+    {
+      "position": 17,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-14",
+        "endDate": "2026-07-14",
+        "description": "Gain skills to improve environmental management, apply ISO standards effectively, audit compliance, and drive sustainable results.",
+        "url": "https://www.eventbrite.co.uk/e/opex-iso-140012026-fourth-edition-implementation-workshop-tickets-1991349105781",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1186383085%2F241160731387%2F1%2Foriginal.20260608-083608?crop=focalpoint&fit=crop&h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=6db20446e940756ab2742042e7ac7529",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "New York Way",
+            "postalCode": "S60 1FJ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.42686759999999",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3624572"
+          },
+          "@type": "Place",
+          "name": "AESSEAL New York Stadium"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "OPEX \u2013 ISO 14001:2026 (Fourth Edition) Implementation Workshop"
+      }
+    },
+    {
+      "position": 18,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-22",
+        "endDate": "2026-07-22",
+        "description": "Learn about energy efficiency in rental homes. Drop in for a chat with our retrofit expert and enjoy a complimentary drink.",
+        "url": "https://www.eventbrite.co.uk/e/rotherham-energy-efficiency-cafe-for-landlords-tickets-1991050555810",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1184018055%2F2259248484753%2F1%2Foriginal.20260507-135002?crop=focalpoint&fit=crop&w=422&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=d3338caab55a2cf0ec38a4fdbe53a105",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Forge Island",
+            "postalCode": "S60 1QJ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4310299",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.360018"
+          },
+          "@type": "Place",
+          "name": "Vetro Lounge"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Rotherham Energy Efficiency Caf\u00e9 for Landlords"
+      }
+    },
+    {
+      "position": 19,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-09-17",
+        "endDate": "2026-09-17",
+        "description": "The Chamber Means Business Expo is the must attend event for businesses looking to grow their network and expand their business.",
+        "url": "https://www.eventbrite.co.uk/e/chamber-means-business-expo-2026-tickets-1985797232980",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1180546597%2F594231011163%2F1%2Foriginal.20260324-100742?w=422&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C67%2C422%2C211&s=aa15379f35b230c3b31e9a72f4986b90",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "South Yorkshire",
+            "streetAddress": "New York Way",
+            "postalCode": "S60 1FJ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4276861",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.363184"
+          },
+          "@type": "Place",
+          "name": "AESSEAL New York Stadium"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Chamber Means Business Expo 2026"
+      }
+    },
+    {
+      "position": 20,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-09-26",
+        "endDate": "2026-09-27",
+        "description": "Take your first step onto the Allied Healthcare Career ladder. Learn how to take blood... train as a Phlebotomist.",
+        "url": "https://www.eventbrite.co.uk/e/introduction-to-phlebotomy-course-2-day-course-national-qualification-registration-1781566606679",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1146834603%2F247100886428%2F1%2Foriginal.20241010-144309?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C195%2C5616%2C2808&s=592f6fe8b1fdf78a6d06d787b5ad8e5f",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Holiday Inn - Rotherham",
+            "postalCode": "S60 2XL",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4061963",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3548661"
+          },
+          "@type": "Place",
+          "name": "ROTHERHAM-SHEFFIELD"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "INTRODUCTION TO PHLEBOTOMY COURSE - 2 Day Course (National Qualification)"
+      }
+    },
+    {
+      "position": 21,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-23",
+        "endDate": "2026-07-23",
+        "description": "Step into the archives, uncover stories and bring them to life through shadow puppetry and storytelling!",
+        "url": "https://www.eventbrite.co.uk/e/the-unwritten-chapter-stories-found-in-light-and-shadow-tickets-1992690641350",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1187761767%2F519701233291%2F1%2Foriginal.20260627-140703?crop=focalpoint&fit=crop&h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.5&fp-y=0.5&s=b28a8010e356d49d2ecd64118675ec36",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Rotherham",
+            "addressRegion": "England",
+            "streetAddress": "Ship Hill",
+            "postalCode": "S60 2HG",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4286845",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.356259"
+          },
+          "@type": "Place",
+          "name": "Grimm & Co"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "The Unwritten Chapter: Stories Found In Light And Shadow"
+      }
+    },
+    {
+      "position": 22,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-24",
+        "endDate": "2026-07-24",
+        "description": "Get ready to dance all night at MAMA MIA PARTY DANCE NIGHT\u2014good vibes and great moves guaranteed!",
+        "url": "https://www.eventbrite.com/e/mama-mia-party-dance-night-tickets-1988871954555",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1183863506%2F2962570580201%2F1%2Foriginal.20260505-220826?crop=focalpoint&fit=crop&h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&fp-x=0.497&fp-y=0.253&s=1cdfba7fbb91fcc1c89bd7bf506d8be7",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Whiston",
+            "addressRegion": "England",
+            "streetAddress": "Well Lane",
+            "postalCode": "S60 4HX",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4055799",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3259936"
+          },
+          "@type": "Place",
+          "name": "Whiston Parish Hall"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "**MAMA MIA PARTY DANCE NIGHT**"
+      }
+    },
+    {
+      "position": 23,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-07-25",
+        "endDate": "2026-07-25",
+        "description": "Get ready to rock as John White channels Elvis live in person for a night of classic hits and good vibes!",
+        "url": "https://www.eventbrite.com/e/john-white-as-elvis-tickets-1980513361779",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1174790033%2F2988648425184%2F1%2Foriginal.20260113-230708?w=512&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C4%2C780%2C390&s=c789540fa9daf05e4d59e8f52dc1afd1",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Brinsworth",
+            "addressRegion": "England",
+            "streetAddress": "Whitehill Road",
+            "postalCode": "S60 5JQ",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4019398",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3633236"
+          },
+          "@type": "Place",
+          "name": "The Yorkshire Terrier"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "John White as Elvis"
+      }
+    },
+    {
+      "position": 24,
+      "@type": "ListItem",
+      "item": {
+        "startDate": "2026-10-03",
+        "endDate": "2026-10-03",
+        "description": "Empower Variety Show brings together talented folks to celebrate creativity and fun live on stage! fundraising for cancer charities!",
+        "url": "https://www.eventbrite.com/e/empower-variety-show-tickets-1988153471553",
+        "image": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F1182944442%2F2999789495559%2F1%2Foriginal.20260424-082316?h=200&w=400&auto=format%2Ccompress&q=75&sharp=10&s=17becb0bd1253601a938fdd134c8e543",
+        "location": {
+          "address": {
+            "addressCountry": "GB",
+            "addressLocality": "Brinsworth",
+            "addressRegion": "England",
+            "streetAddress": "Phoenix Grove",
+            "postalCode": "S60 5PB",
+            "@type": "PostalAddress"
+          },
+          "geo": {
+            "latitude": "53.4096158",
+            "@type": "GeoCoordinates",
+            "longitude": "-1.3726281"
+          },
+          "@type": "Place",
+          "name": "Phoenix Grove"
+        },
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "@type": "Event",
+        "name": "Empower Variety Show"
+      }
+    }
+  ],
+  "@type": "ItemList"
+}

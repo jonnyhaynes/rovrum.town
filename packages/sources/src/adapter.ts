@@ -13,8 +13,21 @@ export interface AdapterSource {
 export interface SourceConfig {
   /** Regional feed → items get the Rotherham relevance filter (applied by the worker). */
   regional?: boolean;
-  /** CSS selectors for the HTML adapter. */
+  /** CSS selectors for the HTML adapter's default card-scraping strategy. */
   selectors?: HtmlSelectors;
+  /**
+   * Extraction strategy for the HTML adapter. `"cards"` (default) uses `selectors`;
+   * `"jsonLd"` parses the page's `application/ld+json` `ItemList` instead — more
+   * robust for pages (e.g. Eventbrite) that ship structured event data.
+   */
+  strategy?: "cards" | "jsonLd";
+  /**
+   * When set, the HTML adapter keeps only items whose location matches one of these
+   * localities (case-insensitive, whole-word). Applied by the `jsonLd` strategy
+   * against each event's `location.address.addressLocality`. Scopes loose "near X"
+   * listing pages down to genuine local results. Empty/undefined → no locality filter.
+   */
+  localityAllow?: string[];
 }
 
 /** CSS selectors driving the Cheerio HTML adapter. */

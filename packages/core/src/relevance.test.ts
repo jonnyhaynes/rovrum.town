@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isRotherhamRelevant } from "./relevance.js";
+import { isRotherhamRelevant, isRotherhamLocality, ROTHERHAM_TOWNS } from "./relevance.js";
 
 describe("isRotherhamRelevant", () => {
   it("matches on 'Rotherham' regardless of case", () => {
@@ -31,5 +31,45 @@ describe("isRotherhamRelevant", () => {
   it("handles empty / whitespace input", () => {
     expect(isRotherhamRelevant("")).toBe(false);
     expect(isRotherhamRelevant("   ")).toBe(false);
+  });
+});
+
+describe("isRotherhamLocality", () => {
+  it("matches Rotherham-area town names regardless of case", () => {
+    expect(isRotherhamLocality("Rotherham")).toBe(true);
+    expect(isRotherhamLocality("brinsworth")).toBe(true);
+    expect(isRotherhamLocality("Wath")).toBe(true);
+  });
+
+  it("rejects out-of-area localities", () => {
+    expect(isRotherhamLocality("Sheffield")).toBe(false);
+    expect(isRotherhamLocality("Meadowhall")).toBe(false);
+    expect(isRotherhamLocality("Toronto")).toBe(false);
+    expect(isRotherhamLocality("London")).toBe(false);
+  });
+
+  it("does NOT match the football-club keywords (not place names)", () => {
+    // "Millers"/"RUFC" flag relevance but are not localities — a locality filter
+    // must not let them through.
+    expect(isRotherhamLocality("Millers")).toBe(false);
+    expect(isRotherhamLocality("RUFC")).toBe(false);
+  });
+
+  it("matches whole words only", () => {
+    expect(isRotherhamLocality("Astonbury Festival")).toBe(false);
+  });
+
+  it("handles empty / whitespace input", () => {
+    expect(isRotherhamLocality("")).toBe(false);
+    expect(isRotherhamLocality("   ")).toBe(false);
+  });
+});
+
+describe("ROTHERHAM_TOWNS", () => {
+  it("is the shared town vocabulary (lowercase, no club keywords)", () => {
+    expect(ROTHERHAM_TOWNS).toContain("rotherham");
+    expect(ROTHERHAM_TOWNS).not.toContain("millers");
+    expect(ROTHERHAM_TOWNS).not.toContain("rufc");
+    expect(ROTHERHAM_TOWNS.every((t) => t === t.toLowerCase())).toBe(true);
   });
 });
