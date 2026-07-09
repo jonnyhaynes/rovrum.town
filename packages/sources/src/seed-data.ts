@@ -159,9 +159,12 @@ export const SEED_SOURCES: SeedSource[] = [
     enabled: true,
   },
   {
+    // The site-wide /feed/ is empty (events are a custom post type); the events
+    // feed carries the real items. It 403s a bare client — the worker sends a
+    // browser-like UA to clear the WordPress/WAF bot block (no browser needed).
     name: "Wentworth Woodhouse",
     type: "RSS",
-    url: "https://wentworthwoodhouse.org.uk/feed/",
+    url: "https://wentworthwoodhouse.org.uk/whats-on/feed/",
     vertical: "EVENTS",
     fetchCadence: SLOW,
     enabled: true,
@@ -206,11 +209,32 @@ export const SEED_SOURCES: SeedSource[] = [
     },
   },
 
+  // NHS Jobs is fully server-rendered (NHS.UK design system) — plain Cheerio, no
+  // browser. Stable `data-test` hooks; the title anchor is both title and link.
+  {
+    name: "NHS Jobs — Rotherham",
+    type: "HTML",
+    url: "https://www.jobs.nhs.uk/candidate/search/results?location=Rotherham",
+    vertical: "JOBS",
+    fetchCadence: JOBS,
+    enabled: true,
+    config: {
+      selectors: {
+        item: 'li[data-test="search-result"]',
+        title: '[data-test="search-result-job-title"]',
+        link: '[data-test="search-result-job-title"]',
+        excerpt: '[data-test="search-result-location"]',
+      },
+    },
+  },
+
   // ── Seeded but disabled — need Playwright (Phase 1b) ─────────────────────
-  // These are JS-rendered and cannot be scraped with Cheerio; they wait on the
-  // Playwright adapter. Investigated live 2026-07-09 (issue #9):
-  // - `rotherham.gov.uk/jobs` is a hub page (no vacancies); the real listings live
-  //   on the JS-driven WebiTrent portal below, whose static HTML is an empty shell.
+  // Genuinely JS-rendered; wait on the Playwright adapter (re-typed to PLAYWRIGHT
+  // when it lands). Investigated live 2026-07-09:
+  // - iTrent: `rotherham.gov.uk/jobs` is a hub; real vacancies are on this
+  //   session-bound WebiTrent app shell (POST-driven results, "show more").
+  // - Millers: client-rendered Nuxt; the news API is AWS-Cognito-gated (spike hit
+  //   401), so there's no clean unauthenticated JSON path — scrape the rendered DOM.
   {
     name: "Rotherham MBC — Jobs",
     type: "HTML",
@@ -225,14 +249,6 @@ export const SEED_SOURCES: SeedSource[] = [
     url: "https://www.themillers.co.uk/news/",
     vertical: "SPORTS",
     fetchCadence: NEWS,
-    enabled: false,
-  },
-  {
-    name: "NHS Jobs — Rotherham",
-    type: "HTML",
-    url: "https://www.jobs.nhs.uk/candidate/search/results?location=Rotherham",
-    vertical: "JOBS",
-    fetchCadence: JOBS,
     enabled: false,
   },
 ];

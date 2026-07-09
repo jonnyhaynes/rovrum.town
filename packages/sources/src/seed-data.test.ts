@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import { SEED_SOURCES } from "./seed-data.js";
 
 describe("SEED_SOURCES", () => {
-  it("has the expected shape: 22 sources, 19 enabled, 3 disabled", () => {
+  it("has the expected shape: 22 sources, 20 enabled, 2 disabled", () => {
     expect(SEED_SOURCES).toHaveLength(22);
-    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(19);
-    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(3);
+    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(20);
+    expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(2);
   });
 
   it("has unique URLs (upsert key must not collide)", () => {
@@ -38,14 +38,17 @@ describe("SEED_SOURCES", () => {
     expect(disabled).toEqual([
       "Rotherham MBC — Jobs",
       "Rotherham United (Millers) — official",
-      "NHS Jobs — Rotherham",
     ]);
   });
 
-  it("all enabled sources are RSS, except the JSON-LD Eventbrite source", () => {
+  it("enabled non-RSS sources are the JSON-LD Eventbrite + the Cheerio NHS Jobs source", () => {
     const nonRss = SEED_SOURCES.filter((s) => s.enabled && s.type !== "RSS");
-    expect(nonRss.map((s) => s.name)).toEqual(["Eventbrite — Rotherham"]);
-    expect(nonRss.every((s) => s.config?.strategy === "jsonLd")).toBe(true);
+    expect(nonRss.map((s) => s.name).sort()).toEqual([
+      "Eventbrite — Rotherham",
+      "NHS Jobs — Rotherham",
+    ]);
+    // Both are HTML: Eventbrite via jsonLd, NHS via CSS selectors.
+    expect(nonRss.every((s) => s.type === "HTML")).toBe(true);
   });
 
   it("covers all four verticals", () => {

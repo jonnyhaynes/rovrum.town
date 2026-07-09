@@ -65,6 +65,18 @@ describe("RssAdapter", () => {
     expect(items.every((i) => i.title && i.link)).toBe(true);
   });
 
+  it("parses the Wentworth Woodhouse events feed (/whats-on/feed/)", async () => {
+    // The site-wide /feed/ is empty; the events post-type feed carries the items.
+    const adapter = new RssAdapter({ fetchImpl: stubFetch(fixture("ww-whats-on.rss.xml")) });
+    const items = await adapter.fetch({
+      id: "src_ww",
+      type: "RSS",
+      url: "https://wentworthwoodhouse.org.uk/whats-on/feed/",
+    });
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.every((i) => i.title && i.link.startsWith("https://"))).toBe(true);
+  });
+
   it("sends the configured User-Agent", async () => {
     let seenUA: string | null = null;
     const spyFetch = (async (_url: string | URL | Request, init?: RequestInit) => {

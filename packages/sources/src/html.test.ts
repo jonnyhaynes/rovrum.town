@@ -137,3 +137,33 @@ describe("HtmlAdapter — jsonLd strategy (Eventbrite fixture)", () => {
     expect(items).toEqual([]);
   });
 });
+
+const nhsSource: AdapterSource = {
+  id: "src_nhs_jobs",
+  type: "HTML",
+  url: "https://www.jobs.nhs.uk/candidate/search/results?location=Rotherham",
+  config: {
+    selectors: {
+      item: 'li[data-test="search-result"]',
+      title: '[data-test="search-result-job-title"]',
+      link: '[data-test="search-result-job-title"]',
+      excerpt: '[data-test="search-result-location"]',
+    },
+  },
+};
+
+describe("HtmlAdapter — NHS Jobs (live fixture, Cheerio cards)", () => {
+  it("extracts the page-1 job results with titles and absolute links", async () => {
+    const adapter = new HtmlAdapter({ fetchImpl: stubFetch(fixture("nhs-jobs.html")) });
+    const items = await adapter.fetch(nhsSource);
+
+    expect(items.length).toBe(10); // 10 results server-rendered on page 1
+    for (const it of items) {
+      expect(it.title).toBeTruthy();
+      // Relative /candidate/jobadvert/... hrefs resolve against the source host.
+      expect(it.link).toMatch(/^https:\/\/www\.jobs\.nhs\.uk\/candidate\/jobadvert\//);
+    }
+    // The location line is captured as the excerpt.
+    expect(items.some((i) => i.summary)).toBe(true);
+  });
+});
