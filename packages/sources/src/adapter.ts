@@ -1,9 +1,13 @@
+import type { Browser } from "playwright";
 import type { FetchedItem } from "@rovrum/core";
+
+/** A source `type`, mirroring the DB `SourceType` enum. */
+export type SourceType = "RSS" | "HTML" | "API" | "PLAYWRIGHT";
 
 /** The Source fields an adapter needs. Structural subset of the DB `Source` row. */
 export interface AdapterSource {
   id: string;
-  type: "RSS" | "HTML" | "API";
+  type: SourceType;
   url: string;
   /** Per-source config: HTML selectors, flags, etc. */
   config?: SourceConfig | null;
@@ -28,7 +32,48 @@ export interface SourceConfig {
    * listing pages down to genuine local results. Empty/undefined → no locality filter.
    */
   localityAllow?: string[];
+  /** Recipe for the Playwright adapter (JS-rendered sources). */
+  playwright?: PlaywrightConfig;
 }
+
+/**
+ * Per-site recipe for the Playwright adapter. The *mechanism* (launch a page, wait,
+ * dismiss consent, click "show more", scrape) is source-agnostic; the selectors and
+ * steps here are the per-site data. Item extraction reuses `SourceConfig.selectors`
+ * against the rendered DOM.
+ */
+export interface PlaywrightConfig {
+  /** Selector to wait for before scraping (the list must have hydrated). */
+  waitFor: string;
+  /**
+   * Extra settle time (ms) after `waitFor` matches, before scraping. Some apps
+   * render the first item early then hydrate the rest — waiting for one match
+   * would scrape a partial list. Defaults to 0.
+   */
+  settleMs?: number;
+  /** Optional selector to click once to dismiss a cookie/consent banner. */
+  consentClick?: string;
+  /** Optional "load more"/pagination selector, clicked repeatedly (bounded). */
+  showMore?: string;
+  /** Max times to click `showMore` (safety bound against runaway loops). */
+  showMoreLimit?: number;
+  /** Optional ordered pre-scrape actions (e.g. iTrent: select region, submit). */
+  steps?: PlaywrightStep[];
+  /**
+   * When true, items whose link selector yields no usable href fall back to the
+   * source (page) URL as their canonical link, instead of being dropped. For portals
+   * (e.g. iTrent) that render real items but expose no per-item URL — accepted with
+   * the trade-off that all such items share one link. Off by default.
+   */
+  linkFallbackToSource?: boolean;
+}
+
+/** A single typed pre-scrape action. Not arbitrary code — a small fixed vocabulary. */
+export type PlaywrightStep =
+  | { action: "click"; selector: string }
+  | { action: "select"; selector: string; value: string }
+  | { action: "fill"; selector: string; value: string }
+  | { action: "waitFor"; selector: string };
 
 /** CSS selectors driving the Cheerio HTML adapter. */
 export interface HtmlSelectors {
@@ -52,6 +97,13 @@ export interface FetchDeps {
   fetchImpl?: typeof fetch;
   /** User-Agent to send (several feeds 403 a bare client). */
   userAgent?: string;
+  /**
+   * A shared, long-lived Playwright browser for the PlaywrightAdapter. The worker
+   * owns it (launch at boot, close on shutdown) and injects it here — launching
+   * Chromium per fetch would be far too expensive. The adapter creates a fresh
+   * context+page per fetch and closes them after. Omitted for RSS/HTML sources.
+   */
+  browser?: Browser;
 }
 
 export type { FetchedItem };

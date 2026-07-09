@@ -1,4 +1,5 @@
 import "./env.js";
+import { chromium, type Browser } from "playwright";
 import { prisma } from "@rovrum/db";
 import { createBoss, ensureQueues, INGEST_QUEUE } from "./boss.js";
 import { runIngest } from "./ingest.js";
@@ -17,6 +18,18 @@ async function main(): Promise<void> {
   const boss = createBoss(connectionString);
   boss.on("error", (err) => console.error("[pg-boss]", err));
 
+  // One long-lived browser shared across all Playwright ingests — launching
+  // Chromium per fetch would be far too expensive. Launched lazily on first use
+  // so RSS-only runs (and the boot sequence) never pay for it.
+  let browser: Browser | undefined;
+  const getBrowser = async (): Promise<Browser> => {
+    if (!browser) {
+      browser = await chromium.launch();
+      console.log("[playwright] browser launched");
+    }
+    return browser;
+  };
+
   await boss.start();
   await ensureQueues(boss);
   await boss.createQueue(DISPATCH_QUEUE);
@@ -28,7 +41,10 @@ async function main(): Promise<void> {
     await Promise.all(
       jobs.map(async (job) => {
         const { sourceId } = job.data as { sourceId: string };
-        const result = await runIngest({ prisma, fetchDeps: { userAgent: USER_AGENT } }, sourceId);
+        const result = await runIngest(
+          { prisma, fetchDeps: { userAgent: USER_AGENT }, getBrowser },
+          sourceId,
+        );
         console.log(
           `[ingest] ${sourceId} ${result.status} found=${result.itemsFound} new=${result.itemsNew} dropped=${result.droppedIrrelevant}`,
         );
@@ -51,6 +67,7 @@ async function main(): Promise<void> {
   const shutdown = async (signal: string): Promise<void> => {
     console.log(`\n${signal} received — stopping gracefully…`);
     await boss.stop();
+    if (browser) await browser.close();
     await prisma.$disconnect();
     process.exit(0);
   };

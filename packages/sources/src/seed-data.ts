@@ -4,7 +4,7 @@ import type { SourceConfig } from "./adapter.js";
 /** A source to seed into the `sources` registry. Matches the DB `Source` model. */
 export interface SeedSource {
   name: string;
-  type: "RSS" | "HTML";
+  type: "RSS" | "HTML" | "PLAYWRIGHT";
   url: string;
   vertical: "NEWS" | "SPORTS" | "EVENTS" | "JOBS";
   /** Fetch cadence in minutes. */
@@ -159,9 +159,12 @@ export const SEED_SOURCES: SeedSource[] = [
     enabled: true,
   },
   {
+    // The site-wide /feed/ is empty (events are a custom post type); the events
+    // feed carries the real items. It 403s a bare client — the worker sends a
+    // browser-like UA to clear the WordPress/WAF bot block (no browser needed).
     name: "Wentworth Woodhouse",
     type: "RSS",
-    url: "https://wentworthwoodhouse.org.uk/feed/",
+    url: "https://wentworthwoodhouse.org.uk/whats-on/feed/",
     vertical: "EVENTS",
     fetchCadence: SLOW,
     enabled: true,
@@ -206,33 +209,74 @@ export const SEED_SOURCES: SeedSource[] = [
     },
   },
 
-  // ── Seeded but disabled — need Playwright (Phase 1b) ─────────────────────
-  // These are JS-rendered and cannot be scraped with Cheerio; they wait on the
-  // Playwright adapter. Investigated live 2026-07-09 (issue #9):
-  // - `rotherham.gov.uk/jobs` is a hub page (no vacancies); the real listings live
-  //   on the JS-driven WebiTrent portal below, whose static HTML is an empty shell.
-  {
-    name: "Rotherham MBC — Jobs",
-    type: "HTML",
-    url: "https://ce0351li.webitrent.com/ce0351li_webrecruitment/wrd/run/ETREC179GF.open?WVID=70298800Qz",
-    vertical: "JOBS",
-    fetchCadence: JOBS,
-    enabled: false,
-  },
-  {
-    name: "Rotherham United (Millers) — official",
-    type: "HTML",
-    url: "https://www.themillers.co.uk/news/",
-    vertical: "SPORTS",
-    fetchCadence: NEWS,
-    enabled: false,
-  },
+  // NHS Jobs is fully server-rendered (NHS.UK design system) — plain Cheerio, no
+  // browser. Stable `data-test` hooks; the title anchor is both title and link.
   {
     name: "NHS Jobs — Rotherham",
     type: "HTML",
     url: "https://www.jobs.nhs.uk/candidate/search/results?location=Rotherham",
     vertical: "JOBS",
     fetchCadence: JOBS,
-    enabled: false,
+    enabled: true,
+    config: {
+      selectors: {
+        item: 'li[data-test="search-result"]',
+        title: '[data-test="search-result-job-title"]',
+        link: '[data-test="search-result-job-title"]',
+        excerpt: '[data-test="search-result-location"]',
+      },
+    },
+  },
+
+  // ── Playwright (JS-rendered) — recipes confirmed against the live DOM 2026-07-09 ──
+  // Millers: client-rendered Nuxt; the news API is AWS-Cognito-gated (spike hit 401),
+  // so scrape the rendered DOM. `a.news-article` cards, `h3` titles, real per-article
+  // URLs on the card anchor itself.
+  {
+    name: "Rotherham United (Millers) — official",
+    type: "PLAYWRIGHT",
+    url: "https://www.themillers.co.uk/news/",
+    vertical: "SPORTS",
+    fetchCadence: NEWS,
+    enabled: true,
+    config: {
+      playwright: {
+        waitFor: "a.news-article",
+        // The hero card renders first (~1s); the rest hydrate by ~3s.
+        settleMs: 4000,
+        consentClick: "#onetrust-accept-btn-handler",
+      },
+      selectors: {
+        item: "a.news-article", // the card is itself the anchor
+        title: "h3",
+        link: "a.news-article",
+      },
+    },
+  },
+  // iTrent (WebiTrent): `rotherham.gov.uk/jobs` is a hub; real vacancies render on
+  // this portal, but it exposes NO stable per-vacancy URL (links are
+  // javascript:void(0), results come from session-bound JSON). Decision: ingest
+  // anyway, linking every job to the search-results page (linkFallbackToSource).
+  // Trade-off: all iTrent jobs share one canonical link → title-only dedup.
+  {
+    name: "Rotherham MBC — Jobs",
+    type: "PLAYWRIGHT",
+    url: "https://ce0351li.webitrent.com/ce0351li_webrecruitment/wrd/run/ETREC179GF.open?WVID=70298800Qz",
+    vertical: "JOBS",
+    fetchCadence: JOBS,
+    enabled: true,
+    config: {
+      playwright: {
+        waitFor: ".Mhr-jobDetailTitleContainer",
+        linkFallbackToSource: true,
+      },
+      selectors: {
+        item: ".Mhr-jobDetailTitleContainer",
+        // The anchor has a visible title span + an aria-hidden " Job profile" span;
+        // target the first span so the suffix doesn't bleed into the title.
+        title: "a.Mhr-jobDetailTitleLink span:first-child",
+        link: "a.Mhr-jobDetailTitleLink",
+      },
+    },
   },
 ];
