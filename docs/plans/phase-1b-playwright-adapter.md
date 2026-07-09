@@ -148,24 +148,27 @@ system libraries**. Options:
   (0 new), and that failures are per-source (never crash the batch).
 - Seed count becomes **all 22 enabled** (or note any that remain problematic).
 
-## Acceptance criteria
-- [ ] NHS Jobs enabled (Cheerio) — live run yields real Rotherham job listings.
-- [ ] Wentworth Woodhouse re-pointed at `/whats-on/feed/` with a UA that clears the 403 —
-      live run yields events.
-- [ ] `PlaywrightAdapter` extracts Millers news + iTrent vacancies from the rendered DOM,
-      with a single worker-owned browser (context/page per fetch), consent + show-more
-      handled; per-source failures don't crash the batch.
-- [ ] `PLAYWRIGHT` source type added (migration) and wired through registry/seed/types.
-- [ ] Worker image ships Chromium and runs the browser sources **in-container**.
-- [ ] Fixtures committed + unit tests (NHS Cheerio, WW RSS, and a Playwright extraction
-      test against saved rendered HTML). CI stays network-free.
-- [ ] Live verify: sane counts, dedup holds, no global junk.
+## Acceptance criteria — all met
+- [x] NHS Jobs enabled (Cheerio) — live run yields real Rotherham job listings (10).
+- [x] Wentworth Woodhouse re-pointed at `/whats-on/feed/`; existing RovrumBot UA clears the
+      403 (the block only hit bare curl). Live run yields 10 events.
+- [x] `PlaywrightAdapter` extracts Millers (17) + iTrent (10) from the rendered DOM, single
+      worker-owned browser (context/page per fetch, launched lazily), consent + settle
+      handled; per-source failures never crash the batch (runIngest records FAILED).
+- [x] `PLAYWRIGHT` source type added (migration) and wired through registry/seed/types.
+- [x] Worker image ships Chromium and runs the browser sources **in-container** (verified:
+      all 22 sources' latest run SUCCESS, both Playwright sources via the real browser).
+- [x] Fixtures committed (nhs-jobs.html, ww-whats-on.rss.xml, millers-news.rendered.html)
+      + unit tests (38 sources tests); CI stays network-free (browser stubbed).
+- [x] Live verify: sane counts, dedup holds (re-run 0 new), iTrent titles clean.
 
 ## Out of scope / risks
 - **Reverse-engineering the Millers Cognito token flow** — rejected (fragile, secret
   liability); DOM scrape instead.
-- The **image size grows** materially (browser + libs). Acceptable for a background
-  worker; called out so it's a decision, not a surprise.
+- The **image size grows** materially (browser + libs) — measured **~2.5 GB** (local
+  arm64 build). Acceptable for a background worker; called out so it's a decision, not a
+  surprise. (If it ever matters, option B's slim-browser or a separate Playwright-only
+  worker image are levers.)
 - iTrent markup is brittle and session-bound; the `showMore` loop is bounded and the
   source degrades to "0 new, SUCCESS-with-warning" rather than crashing if selectors
   drift. A live-fixture test guards the parse step.
