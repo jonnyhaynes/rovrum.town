@@ -5,8 +5,8 @@
   "// ": "is a pnpm+Turborepo monorepo with Prisma + a heavy Playwright/Chromium dep;",
   "//  ": "Vercel's zero-config path would install/build the workspace and fail. The",
   "//   ": "web app (Phase 2, Astro) will set its own build config when it lands.",
-  "buildCommand": null,
-  "installCommand": null,
+  "buildCommand": "",
+  "installCommand": "",
   "outputDirectory": "public",
   "headers": [
     {
