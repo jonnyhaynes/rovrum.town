@@ -1,3 +1,4 @@
+import { ROTHERHAM_TOWNS } from "@rovrum/core";
 import type { SourceConfig } from "./adapter.js";
 
 /** A source to seed into the `sources` registry. Matches the DB `Source` model. */
@@ -184,45 +185,40 @@ export const SEED_SOURCES: SeedSource[] = [
     enabled: true,
   },
 
-  // ── HTML (Cheerio) — disabled pending selector work (see follow-up) ──────
-  // A live run showed these need real markup work: council-jobs matched 0 items
-  // (wrong selectors) and Eventbrite returned global, non-Rotherham events (URL
-  // isn't location-scoping the cards). Seeded with best-guess selectors but
-  // disabled so we don't serve wrong data; fix against live markup in follow-up.
-  {
-    name: "Rotherham MBC — Jobs",
-    type: "HTML",
-    url: "https://www.rotherham.gov.uk/jobs",
-    vertical: "JOBS",
-    fetchCadence: JOBS,
-    enabled: false,
-    config: {
-      selectors: {
-        item: ".list--articles li, .job-list li",
-        title: "a",
-        link: "a",
-        excerpt: "p",
-      },
-    },
-  },
+  // ── Eventbrite (HTML, JSON-LD strategy) — Rotherham-area events ──────────
+  // The listing page ships an `application/ld+json` ItemList with per-event
+  // `location.address.addressLocality`, so we extract from that (robust) and keep
+  // only Rotherham-area localities — the `/d/united-kingdom--rotherham/` URL is a
+  // loose "near" browse, not a filter, so the towns list does the real scoping.
+  // NOT `regional`: the keyword filter runs on title/excerpt and would wrongly drop
+  // a genuinely-local event with a generic title (e.g. "Yoga for Mobility"). The
+  // structured-locality filter is the precise, sufficient gate.
   {
     name: "Eventbrite — Rotherham",
     type: "HTML",
     url: "https://www.eventbrite.co.uk/d/united-kingdom--rotherham/events/",
     vertical: "EVENTS",
     fetchCadence: SLOW,
-    enabled: false,
+    enabled: true,
     config: {
-      selectors: {
-        item: "section.event-card, div.event-card",
-        title: "h3, .event-card__clamp-line--two",
-        link: "a.event-card-link",
-        image: "img",
-      },
+      strategy: "jsonLd",
+      localityAllow: [...ROTHERHAM_TOWNS],
     },
   },
 
   // ── Seeded but disabled — need Playwright (Phase 1b) ─────────────────────
+  // These are JS-rendered and cannot be scraped with Cheerio; they wait on the
+  // Playwright adapter. Investigated live 2026-07-09 (issue #9):
+  // - `rotherham.gov.uk/jobs` is a hub page (no vacancies); the real listings live
+  //   on the JS-driven WebiTrent portal below, whose static HTML is an empty shell.
+  {
+    name: "Rotherham MBC — Jobs",
+    type: "HTML",
+    url: "https://ce0351li.webitrent.com/ce0351li_webrecruitment/wrd/run/ETREC179GF.open?WVID=70298800Qz",
+    vertical: "JOBS",
+    fetchCadence: JOBS,
+    enabled: false,
+  },
   {
     name: "Rotherham United (Millers) — official",
     type: "HTML",
