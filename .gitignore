@@ -50,3 +50,6 @@ docker-data/
 # Expo (mobile, later)
 .expo/
 .vercel
+
+# Claude Code local runtime
+.claude/scheduled_tasks.lock

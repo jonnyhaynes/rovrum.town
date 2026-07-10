@@ -13,7 +13,7 @@
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,mjs,json,md,yml,yaml,astro}\"",
     "db:generate": "pnpm --filter @rovrum/db db:generate",
     "db:migrate": "pnpm --filter @rovrum/db db:migrate",
     "db:studio": "pnpm --filter @rovrum/db db:studio",
@@ -22,10 +22,15 @@
   "devDependencies": {
     "@types/node": "^22.10.0",
     "prettier": "^3.4.2",
+    "prettier-plugin-astro": "^0.14.1",
     "turbo": "^2.5.0",
     "typescript": "^5.7.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
   }
 }
