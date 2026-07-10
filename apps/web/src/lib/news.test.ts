@@ -16,7 +16,7 @@ vi.mock("@rovrum/db", () => ({
 }));
 
 // Imported after the mock is registered.
-const { getLatestNews } = await import("./news.js");
+const { getLatestNews, getAllNews } = await import("./news.js");
 
 /** A Prisma-row-shaped fixture (superset of what the view needs). */
 function row(over: Record<string, unknown> = {}) {
@@ -102,5 +102,34 @@ describe("getLatestNews", () => {
     await getLatestNews();
     const arg = findMany.mock.calls[0]![0] as { take: number };
     expect(arg.take).toBeGreaterThan(0);
+  });
+});
+
+describe("getAllNews", () => {
+  beforeEach(() => {
+    findMany.mockReset();
+  });
+
+  it("fetches all NEWS items newest-first with no take limit (for paginate())", async () => {
+    findMany.mockResolvedValueOnce([row(), row({ id: "c2" })]);
+    const items = await getAllNews();
+
+    const arg = findMany.mock.calls[0]![0] as {
+      where: { vertical: string };
+      orderBy: unknown;
+      take?: number;
+    };
+    expect(arg.where.vertical).toBe("NEWS");
+    expect(arg.orderBy).toEqual([{ publishedAt: "desc" }, { id: "desc" }]);
+    expect(arg.take).toBeUndefined(); // paginate() slices; we don't cap here
+    expect(items).toHaveLength(2);
+  });
+
+  it("projects to the narrow view type", async () => {
+    findMany.mockResolvedValueOnce([row()]);
+    const [item] = await getAllNews();
+    expect(item).not.toHaveProperty("raw");
+    expect(item).not.toHaveProperty("source");
+    expect(item!.sourceName).toBe("Rotherham Advertiser");
   });
 });

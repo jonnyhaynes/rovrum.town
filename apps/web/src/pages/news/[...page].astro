@@ -1,0 +1,83 @@
+---
+// The News feed — home of the vertical, served under /news (/news, /news/2, …)
+// until go-live. SSG: getStaticPaths pulls every NEWS item from the data layer
+// at build time and paginate() slices it into pages. Each card links OUT to its
+// source (aggregator boundary). See docs/plans/phase-2-web-mvp.md §5.
+import type { GetStaticPaths, Page } from "astro";
+import Layout from "../../layouts/Layout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import Pagination from "../../components/Pagination.astro";
+import { getAllNews, NEWS_PER_PAGE, type NewsCardView } from "../../lib/news.js";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const items = await getAllNews();
+  return paginate(items, { pageSize: NEWS_PER_PAGE });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<NewsCardView>;
+}
+
+const { page } = Astro.props;
+const title = page.currentPage > 1 ? `News — page ${page.currentPage} — Rovrum` : "News — Rovrum";
+---
+
+<Layout title={title} description="Local news from across Rotherham, all in one place.">
+  <div class="feed">
+    <header class="feed__head">
+      <p class="feed__eyebrow">Rovrum · News</p>
+      <h1 class="feed__title">Everything Rovrum, in one spot.</h1>
+    </header>
+
+    {
+      page.data.length === 0 ? (
+        <p class="feed__empty">Nowt to show just yet — check back soon.</p>
+      ) : (
+        <div class="feed__list">
+          {page.data.map((item) => (
+            <ArticleCard item={item} />
+          ))}
+        </div>
+      )
+    }
+
+    <Pagination
+      prevUrl={page.url.prev}
+      nextUrl={page.url.next}
+      current={page.currentPage}
+      last={page.lastPage}
+    />
+  </div>
+</Layout>
+
+<style>
+  .feed {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .feed__head {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .feed__eyebrow {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--stone);
+    margin: 0 0 0.4rem;
+  }
+
+  .feed__title {
+    font-size: clamp(1.6rem, 5vw, 2.3rem);
+    margin: 0;
+  }
+
+  .feed__empty {
+    color: var(--stone);
+    padding: 2rem 0;
+  }
+</style>
