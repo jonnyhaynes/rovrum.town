@@ -8,7 +8,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // Runtime / build-time queries use the pooled connection (ideal for the
+  // short-lived Vercel build and any serverless-ish caller).
   url      = env("DATABASE_URL")
+  // Prisma CLI (migrate / db push) needs a direct, unpooled connection. On
+  // Neon this is the non `-pooler` host. Falls back to DATABASE_URL locally,
+  // where a single plain Postgres serves both (see prisma.config.ts).
+  directUrl = env("DIRECT_URL")
 }
 
 enum Vertical {

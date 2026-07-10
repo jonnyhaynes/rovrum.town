@@ -13,15 +13,20 @@ loadEnv({ path: "../../.env" });
 // actually talk to the DB (migrate/push/runtime) require a real DATABASE_URL and
 // will fail loudly against this obviously-fake URL. (Prisma 7.2+ makes the URL
 // optional for `generate`; revisit this when we upgrade.)
-const url =
-  process.env.DATABASE_URL ?? "postgresql://placeholder:placeholder@localhost:5432/placeholder";
+const PLACEHOLDER = "postgresql://placeholder:placeholder@localhost:5432/placeholder";
+
+// The schema references env("DATABASE_URL") and env("DIRECT_URL"); Prisma
+// validates both exist before our datasource overrides apply, so ensure they're
+// set here. DATABASE_URL falls back to a placeholder so `prisma generate` runs
+// with no DB (e.g. the Vercel build). DIRECT_URL (the unpooled connection the
+// CLI needs on pooled providers like Neon) falls back to DATABASE_URL, since a
+// plain local Postgres serves both.
+process.env.DATABASE_URL ??= PLACEHOLDER;
+process.env.DIRECT_URL ??= process.env.DATABASE_URL;
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-  },
-  datasource: {
-    url,
   },
 });
