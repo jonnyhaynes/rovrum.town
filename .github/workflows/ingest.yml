@@ -50,6 +50,11 @@ jobs:
       - name: Generate Prisma client
         run: pnpm db:generate
 
+      # The CLI runs via tsx, but its workspace deps (@rovrum/db etc.) resolve
+      # through their package `exports` to compiled `dist/`, so build the chain.
+      - name: Build workspace dependencies
+        run: pnpm --filter @rovrum/db --filter @rovrum/core --filter @rovrum/sources build
+
       # Playwright sources (RUFC, NHS jobs) need Chromium + its OS libs.
       - name: Install Chromium for Playwright
         run: pnpm --filter @rovrum/sources exec playwright install --with-deps chromium
