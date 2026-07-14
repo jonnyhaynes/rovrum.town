@@ -1,0 +1,63 @@
+# Scheduled ingest into Neon, then rebuild the static /news site.
+#
+# Runs one ingest pass over due sources (per-source cadence gates the actual
+# work) against the Neon database, then pings a Vercel Deploy Hook so the SSG
+# build picks up the fresh content. No always-on worker — see
+# docs/plans/phase-2-scheduled-ingest.md.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   DATABASE_URL            Neon pooled connection string (?sslmode=require)
+#   DIRECT_URL              Neon direct (non-pooler) connection string
+#   VERCEL_DEPLOY_HOOK_URL  Vercel production Deploy Hook URL
+name: ingest
+
+on:
+  schedule:
+    # Hourly, on the hour. Per-source fetchCadence still gates real fetches.
+    - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Ingest every enabled source, ignoring cadence (first fill)"
+        type: boolean
+        default: false
+
+# Never let two ingest runs overlap (double-fetch / racing rebuilds).
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      # Playwright sources (RUFC, NHS jobs) need Chromium + its OS libs.
+      - name: Install Chromium for Playwright
+        run: pnpm --filter @rovrum/sources exec playwright install --with-deps chromium
+
+      - name: Ingest due sources
+        run: pnpm --filter @rovrum/workers ingest:once ${{ inputs.all && '--all' || '' }}
+
+      - name: Trigger site rebuild
+        # Only if the ingest step succeeded (a hard-failed ingest exits non-zero
+        # and this step is skipped, so we don't rebuild on a total outage).
+        run: curl -fsS -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"

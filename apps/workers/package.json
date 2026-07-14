@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "seed": "tsx src/seed-cli.ts",
+    "ingest:once": "tsx src/ingest-cli.ts",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts"
   },
