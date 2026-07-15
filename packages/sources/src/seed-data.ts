@@ -29,14 +29,10 @@ const JOBS = 180;
  */
 export const SEED_SOURCES: SeedSource[] = [
   // ── Rotherham Advertiser (native, high-quality) ──────────────────────────
-  {
-    name: "Rotherham Advertiser — All",
-    type: "RSS",
-    url: "https://www.rotherhamadvertiser.co.uk/rss/",
-    vertical: "NEWS",
-    fetchCadence: NEWS,
-    enabled: true,
-  },
+  // NB: the site-wide "All" feed (/rss/) is intentionally NOT seeded — it's a
+  // superset of the vertical feeds below (so every item is a dup the exact hash
+  // already collapses) and flattens everything to NEWS, losing the vertical. The
+  // vertical-specific feeds cover the same items with correct tagging.
   {
     name: "Rotherham Advertiser — News",
     type: "RSS",
@@ -169,15 +165,6 @@ export const SEED_SOURCES: SeedSource[] = [
     fetchCadence: SLOW,
     enabled: true,
   },
-  {
-    name: "Reddit r/Rotherham",
-    type: "RSS",
-    url: "https://www.reddit.com/r/rotherham/.rss",
-    vertical: "NEWS",
-    fetchCadence: NEWS,
-    enabled: true,
-  },
-
   // ── Jobs ─────────────────────────────────────────────────────────────────
   {
     name: "Reed — Rotherham jobs",
