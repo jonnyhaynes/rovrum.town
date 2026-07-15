@@ -2,6 +2,7 @@ import { normalize, isRotherhamRelevant, type NormalizedItem } from "@rovrum/cor
 import { getAdapter, type AdapterSource, type FetchDeps } from "@rovrum/sources";
 import type { Browser } from "playwright";
 import type { PrismaClient, Source } from "@rovrum/db";
+import { clusterItems } from "./cluster-items.js";
 
 export interface IngestDeps {
   prisma: PrismaClient;
@@ -79,6 +80,18 @@ export async function runIngest(deps: IngestDeps, sourceId: string): Promise<Ing
       skipDuplicates: true,
     });
 
+    // Cross-publisher clustering runs on the rows that survived exact dedup and
+    // aren't yet clustered. createMany returns only a count, so re-read the just-
+    // inserted items by their contentHash. Best-effort: never fails the ingest.
+    const fresh = await prisma.contentItem.findMany({
+      where: {
+        contentHash: { in: normalized.map((n) => n.contentHash) },
+        clusterId: null,
+      },
+      select: { id: true, title: true, vertical: true, publishedAt: true, createdAt: true },
+    });
+    const clusterStats = await clusterItems(prisma, fresh);
+
     await prisma.$transaction([
       prisma.ingestRun.update({
         where: { id: run.id },
@@ -87,7 +100,7 @@ export async function runIngest(deps: IngestDeps, sourceId: string): Promise<Ing
           finishedAt: new Date(),
           itemsFound: fetched.length,
           itemsNew: created.count,
-          stats: { droppedIrrelevant, normalized: normalized.length },
+          stats: { droppedIrrelevant, normalized: normalized.length, ...clusterStats },
         },
       }),
       prisma.source.update({
