@@ -1,7 +1,7 @@
 # rovrum.town
 
 ![Status: Alpha](https://img.shields.io/badge/status-alpha-orange)
-![License: Proprietary](https://img.shields.io/badge/license-proprietary-red)
+![License: Source-available](https://img.shields.io/badge/license-source--available-red)
 [![Website](https://img.shields.io/badge/web-rovrum.town-blue)](https://www.rovrum.town)
 
 > The place for everything Rotherham — news, sports, events, and jobs, aggregated from across the web and served up in one place.
@@ -47,4 +47,5 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full architecture dec
 
 ## License
 
-Proprietary — all rights reserved. See [`LICENSE`](LICENSE).
+Source-available — published for viewing and reference only, all rights
+reserved. No reuse without written permission. See [`LICENSE`](LICENSE).
