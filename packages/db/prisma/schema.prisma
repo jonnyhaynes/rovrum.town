@@ -88,6 +88,14 @@ model ContentItem {
   /// Rotherham-relevance geo/tags.
   location    String?
 
+  /// Cross-publisher story cluster this item belongs to (null = unclustered
+  /// singleton). Fuzzy title clustering groups near-duplicate stories from
+  /// different outlets. See docs/plans/dedup-clustering.md.
+  clusterId String?
+  cluster   StoryCluster? @relation("StoryClusterMembers", fields: [clusterId], references: [id], onDelete: SetNull)
+  /// Back-relation: the cluster (if any) this item is the canonical of.
+  canonicalOf StoryCluster? @relation("StoryClusterCanonical")
+
   /// Original payload, so we never lose data the model doesn't yet capture.
   raw          Json
   /// Vertical-specific extensions (kept as jsonb for now).
@@ -102,7 +110,30 @@ model ContentItem {
   @@index([vertical])
   @@index([publishedAt])
   @@index([sourceId])
+  @@index([clusterId])
   @@map("content_items")
+}
+
+/// A cross-publisher story cluster: near-duplicate items from different outlets
+/// grouped so the feed shows one canonical item with "also reported by" members.
+/// See docs/plans/dedup-clustering.md.
+model StoryCluster {
+  id String @id @default(cuid())
+
+  /// The item shown as the face of the story. Optional + SetNull so deleting the
+  /// canonical item never blocks deletion or drops the cluster — the worker
+  /// re-elects a canonical from the remaining members.
+  canonicalItemId String?      @unique
+  canonicalItem   ContentItem? @relation("StoryClusterCanonical", fields: [canonicalItemId], references: [id], onDelete: SetNull)
+
+  /// All items in the cluster (including the canonical). SetNull on the member
+  /// side leaves an item as an unclustered singleton if the cluster is deleted.
+  members ContentItem[] @relation("StoryClusterMembers")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("story_clusters")
 }
 
 /// A generated social post: draft -> scheduled -> published, with per-platform
