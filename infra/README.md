@@ -24,7 +24,7 @@ volume — just delete `docker-data/` to wipe state).
 Copy the root `.env.example` to `.env`; the defaults already match this compose file:
 
 - `DATABASE_URL=postgresql://rovrum:rovrum@localhost:5432/rovrum?schema=public`
-- `S3_ENDPOINT=http://localhost:9000` · `S3_BUCKET=rovrum` · keys `minioadmin`/`minioadmin`
+- `S3_ENDPOINT=http://localhost:9000` · `S3_BUCKET=rovrum` · keys `rovrum-local`/`change-me-local-only`
 
 MinIO console: <http://localhost:9001> (login with the S3 keys).
 
