@@ -90,7 +90,12 @@ export async function runIngest(deps: IngestDeps, sourceId: string): Promise<Ing
       },
       select: { id: true, title: true, vertical: true, publishedAt: true, createdAt: true },
     });
-    const clusterStats = await clusterItems(prisma, fresh);
+    // All these items come from `source`, so they share its regional flag — the
+    // canonical tie-breaker. Attach it rather than re-querying per item.
+    const clusterStats = await clusterItems(
+      prisma,
+      fresh.map((f) => ({ ...f, regional })),
+    );
 
     await prisma.$transaction([
       prisma.ingestRun.update({

@@ -161,6 +161,42 @@ describe("runIngest (integration)", () => {
     expect((starRun.stats as { clustered: number }).clustered).toBe(1);
   });
 
+  it("re-elects the canonical when a joiner wins the rule (earlier + native)", async () => {
+    // Regional source ingests first (its item becomes canonical), then a native
+    // source's near-duplicate with an EARLIER publish time joins and takes over.
+    const star = await makeSource({ name: "Star", config: { regional: true } });
+    const advertiser = await makeSource({ name: "Advertiser" }); // native
+
+    const starItem: FetchedItem = {
+      title: "Crews tackle warehouse blaze in Rotherham",
+      link: "https://star.example/fire",
+      summary: "y",
+      raw: {},
+      publishedAt: new Date("2026-07-15T12:00:00Z"),
+    };
+    const advItem: FetchedItem = {
+      title: "Fire crews tackle blaze at Rotherham warehouse",
+      link: "https://advertiser.example/fire",
+      summary: "x",
+      raw: {},
+      publishedAt: new Date("2026-07-15T09:00:00Z"), // earlier
+    };
+
+    await runIngest({ prisma, getAdapter: stubAdapter([starItem]) }, star);
+    await runIngest({ prisma, getAdapter: stubAdapter([advItem]) }, advertiser);
+
+    expect(await prisma.storyCluster.count()).toBe(1);
+    const cluster = await prisma.storyCluster.findFirstOrThrow({
+      include: { canonicalItem: true, members: true },
+    });
+    expect(cluster.members).toHaveLength(2);
+    // The earlier, native Advertiser item is now the canonical.
+    expect(cluster.canonicalItem?.canonicalUrl).toBe("https://advertiser.example/fire");
+
+    const advRun = await prisma.ingestRun.findFirstOrThrow({ where: { sourceId: advertiser } });
+    expect((advRun.stats as { recanonicalized: number }).recanonicalized).toBe(1);
+  });
+
   it("keeps unrelated items in separate clusters", async () => {
     const sourceId = await makeSource();
     // A ("council approves park") and B ("Maltby school news") are unrelated.
