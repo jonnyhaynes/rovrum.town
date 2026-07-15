@@ -124,17 +124,20 @@ correct and cheap); clustering runs *after* a row survives exact dedup.
    and Star). Exact hash collapses identical items; clustering groups the rest.
    Advertiser "All" already dropped in the prior merged PR (#26).
 
-## Proposed work breakdown (for review before coding)
-1. **DB migration** — `StoryCluster` model + `ContentItem.clusterId` + index.
-2. **`@rovrum/core`** — `clusterKey` + `similarity` (Sørensen–Dice) + `THRESHOLD`
-   constant, with the headline-pair unit-test suite (true positives + near-miss
-   negatives). Correctness is won here.
-3. **`apps/workers`** — clustering stage after exact-dedup insert: query the 48h
+## Work breakdown — all shipped
+1. ✅ **DB migration** — `StoryCluster` model + `ContentItem.clusterId` + index. (PR #28)
+2. ✅ **`@rovrum/core`** — `clusterKey` + `similarity` (Sørensen–Dice) +
+   `CLUSTER_THRESHOLD`, with the headline-pair unit-test suite (true positives +
+   near-miss negatives). (PR #29)
+3. ✅ **`apps/workers`** — clustering stage after exact-dedup insert: query the 48h
    same-vertical candidates, best-match ≥ threshold → join cluster, else new
-   singleton + become canonical. Wrapped best-effort (failure → singleton, never
-   drops the item). Extend `IngestRun.stats` with `clustered` / `newClusters`.
-4. **Canonical rule** — earliest `publishedAt`, tie-broken by source priority
-   (native Advertiser/MBC > regional Star/BBC), as a reviewable constant.
+   singleton + become canonical. Best-effort (failure → singleton, never drops the
+   item). `IngestRun.stats` gains `clustered` / `newClusters`. (PR #30)
+4. ✅ **Canonical rule** — `shouldReplaceCanonical`: earliest `publishedAt` wins
+   (dated beats undated), ties broken by source priority (native > regional), full
+   tie keeps the incumbent. Re-election runs on join; `IngestRun.stats` gains
+   `recanonicalized`. (this PR)
 
-Each is a candidate for its own PR (migration first). No web/API work — that's
-Phase 2, noted above.
+No web/API work — that's Phase 2, noted above. The feed query returning one row
+per cluster (canonical + "also reported by" members) is where this becomes
+user-visible.
