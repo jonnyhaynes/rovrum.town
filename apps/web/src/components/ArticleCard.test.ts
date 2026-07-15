@@ -12,6 +12,7 @@ const base: NewsCardView = {
   author: "A. Reporter",
   publishedAt: new Date("2026-07-09T10:00:00Z"),
   sourceName: "Rotherham Advertiser",
+  alsoReportedBy: [],
 };
 
 async function render(item: NewsCardView): Promise<string> {
@@ -68,5 +69,17 @@ describe("ArticleCard", () => {
   it("marks external links safe (noopener)", async () => {
     const html = await render(base);
     expect(html).toMatch(/rel=["'][^"']*noopener[^"']*["']/);
+  });
+
+  it("credits other outlets when the story is clustered", async () => {
+    const html = await render({ ...base, alsoReportedBy: ["BBC News", "The Star"] });
+    expect(html).toContain("also reported by");
+    expect(html).toContain("BBC News");
+    expect(html).toContain("The Star");
+  });
+
+  it("omits the 'also reported by' line for a single-source story", async () => {
+    const html = await render({ ...base, alsoReportedBy: [] });
+    expect(html).not.toContain("also reported by");
   });
 });

@@ -40,6 +40,11 @@ const when = item.publishedAt ? relativeTime(item.publishedAt) : null;
       <span class="card__source">{item.sourceName}</span>
       {when && <span class="card__time"> · {when}</span>}
     </p>
+    {
+      item.alsoReportedBy.length > 0 && (
+        <p class="card__also">also reported by {item.alsoReportedBy.join(", ")}</p>
+      )
+    }
   </div>
 </article>
 
@@ -103,5 +108,12 @@ const when = item.publishedAt ? relativeTime(item.publishedAt) : null;
 
   .card__source {
     font-weight: 600;
+  }
+
+  .card__also {
+    margin: 0.35rem 0 0;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--stone);
   }
 </style>
