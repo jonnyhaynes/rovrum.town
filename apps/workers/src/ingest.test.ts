@@ -40,8 +40,11 @@ async function makeSource(overrides: Record<string, unknown> = {}): Promise<stri
   return s.id;
 }
 
-// Clean content between tests so dedup assertions are deterministic.
+// Clean content between tests so dedup assertions are deterministic. Clusters
+// reference content items, so clear them first (FK order).
 beforeEach(async () => {
+  await prisma.contentItem.updateMany({ data: { clusterId: null } });
+  await prisma.storyCluster.deleteMany();
   await prisma.contentItem.deleteMany();
   await prisma.ingestRun.deleteMany();
   await prisma.source.deleteMany();
@@ -50,6 +53,8 @@ beforeEach(async () => {
 afterAll(async () => {
   // Leave the DB clean so a subsequent `seed` + worker run isn't polluted by
   // this suite's test rows.
+  await prisma.contentItem.updateMany({ data: { clusterId: null } });
+  await prisma.storyCluster.deleteMany();
   await prisma.contentItem.deleteMany();
   await prisma.ingestRun.deleteMany();
   await prisma.source.deleteMany();
@@ -118,6 +123,55 @@ describe("runIngest (integration)", () => {
     const result = await runIngest({ prisma, getAdapter: stubAdapter([A, offTopic]) }, sourceId);
     expect(result.itemsNew).toBe(2);
     expect(result.droppedIrrelevant).toBe(0);
+  });
+
+  it("clusters near-duplicate items across two sources into one cluster", async () => {
+    // Same story, different outlet/wording/URL — exact hash won't catch it, fuzzy
+    // clustering must.
+    const advertiser = await makeSource({ name: "Advertiser" });
+    const star = await makeSource({ name: "Star" });
+
+    const advItem: FetchedItem = {
+      title: "Fire crews tackle blaze at Rotherham warehouse",
+      link: "https://advertiser.example/fire",
+      summary: "x",
+      raw: {},
+    };
+    const starItem: FetchedItem = {
+      title: "Crews tackle warehouse blaze in Rotherham",
+      link: "https://star.example/fire",
+      summary: "y",
+      raw: {},
+    };
+
+    await runIngest({ prisma, getAdapter: stubAdapter([advItem]) }, advertiser);
+    await runIngest({ prisma, getAdapter: stubAdapter([starItem]) }, star);
+
+    // Two content items, but one cluster with two members.
+    expect(await prisma.contentItem.count()).toBe(2);
+    expect(await prisma.storyCluster.count()).toBe(1);
+
+    const cluster = await prisma.storyCluster.findFirstOrThrow({
+      include: { members: true },
+    });
+    expect(cluster.members).toHaveLength(2);
+
+    // Second run's IngestRun records the join.
+    const starRun = await prisma.ingestRun.findFirstOrThrow({ where: { sourceId: star } });
+    expect((starRun.stats as { clustered: number }).clustered).toBe(1);
+  });
+
+  it("keeps unrelated items in separate clusters", async () => {
+    const sourceId = await makeSource();
+    // A ("council approves park") and B ("Maltby school news") are unrelated.
+    await runIngest({ prisma, getAdapter: stubAdapter([A, B]) }, sourceId);
+
+    expect(await prisma.contentItem.count()).toBe(2);
+    expect(await prisma.storyCluster.count()).toBe(2);
+
+    const run = await prisma.ingestRun.findFirstOrThrow({ where: { sourceId } });
+    expect((run.stats as { newClusters: number }).newClusters).toBe(2);
+    expect((run.stats as { clustered: number }).clustered).toBe(0);
   });
 
   it("records FAILED (and does not throw) when the adapter fails", async () => {
