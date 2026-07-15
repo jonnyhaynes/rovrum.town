@@ -1,0 +1,4 @@
+{
+  "pitch": "Rovrum — a content platform for everything Rotherham, aggregating news, sports, events and jobs from many local sources into one feed. An Astro web front end over a Dockerised Node ingestion pipeline, with PostgreSQL/Prisma, a pg-boss queue and a provider-agnostic AI layer for automated social posts.",
+  "challenge": "Collapsing the same story covered by different outlets — different URLs, differently-worded headlines — into one entry without wrongly merging distinct stories."
+}
