@@ -23,6 +23,12 @@ export interface NewsCardView {
   author: string | null;
   publishedAt: Date | null;
   sourceName: string;
+  /**
+   * Other outlets covering the same story (cross-publisher cluster members),
+   * named for the "also reported by" credit — alphabetical, de-duped, and never
+   * including this item's own source. Empty for a single-source story.
+   */
+  alsoReportedBy: string[];
 }
 
 export interface GetLatestNewsOptions {
@@ -35,7 +41,15 @@ export const NEWS_PER_PAGE = 20;
 // Shared query pieces so every read stays consistent: NEWS-only, newest-first,
 // and the same narrow column set. Newest-first uses `id` as a stable tiebreak
 // so paging is deterministic and static builds are reproducible.
-const NEWS_WHERE: Prisma.ContentItemWhereInput = { vertical: "NEWS" };
+//
+// One row per story (cluster-aware): a feed row is either an unclustered
+// singleton (clusterId null) OR the canonical of its cluster (`canonicalOf`
+// set). Non-canonical members are excluded from the list — they surface only as
+// "also reported by" on the canonical. See docs/plans/phase-2-feed-clustering.md.
+const NEWS_WHERE: Prisma.ContentItemWhereInput = {
+  vertical: "NEWS",
+  OR: [{ clusterId: null }, { canonicalOf: { isNot: null } }],
+};
 const NEWS_ORDER: Prisma.ContentItemOrderByWithRelationInput[] = [
   { publishedAt: "desc" },
   { id: "desc" },
@@ -49,10 +63,25 @@ const NEWS_SELECT = {
   author: true,
   publishedAt: true,
   source: { select: { name: true } },
+  // The cluster this item heads (null for singletons); its members carry the
+  // source names for the "also reported by" credit.
+  canonicalOf: { select: { members: { select: { source: { select: { name: true } } } } } },
 } satisfies Prisma.ContentItemSelect;
 
 // The exact row shape the select above returns — derived, so it can't drift.
 type NewsRow = Prisma.ContentItemGetPayload<{ select: typeof NEWS_SELECT }>;
+
+/**
+ * The other outlets' names for a canonical row: every cluster member's source
+ * name minus this item's own, de-duped and sorted alphabetically. Empty for a
+ * singleton or a single-source cluster.
+ */
+function otherSources(r: NewsRow): string[] {
+  const members = r.canonicalOf?.members ?? [];
+  const names = new Set(members.map((m) => m.source.name));
+  names.delete(r.source.name);
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
 
 function toView(r: NewsRow): NewsCardView {
   return {
@@ -64,6 +93,7 @@ function toView(r: NewsRow): NewsCardView {
     author: r.author,
     publishedAt: r.publishedAt,
     sourceName: r.source.name,
+    alsoReportedBy: otherSources(r),
   };
 }
 
