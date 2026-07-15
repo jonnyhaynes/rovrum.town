@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { SEED_SOURCES } from "./seed-data.js";
 
 describe("SEED_SOURCES", () => {
-  it("has the expected shape: 22 sources, all enabled", () => {
-    expect(SEED_SOURCES).toHaveLength(22);
-    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(22);
+  it("has the expected shape: 20 sources, all enabled", () => {
+    expect(SEED_SOURCES).toHaveLength(20);
+    expect(SEED_SOURCES.filter((s) => s.enabled)).toHaveLength(20);
     expect(SEED_SOURCES.filter((s) => !s.enabled)).toHaveLength(0);
   });
 
