@@ -1,6 +1,9 @@
 # Plan: reduce feed duplication (remove Reddit, cross-publisher clustering)
 
-Status: **DRAFT — awaiting human approval before any implementation code.**
+Status: **Decisions settled — awaiting human plan sign-off before implementation
+code.** Part 1 (Reddit) and Part 2 (Advertiser "All") already shipped in PR #26.
+Part 3 (clustering) is the remaining work; all four design questions are resolved
+below.
 
 ## Problem
 
@@ -58,23 +61,28 @@ item must be compared against *recent existing items*. So it must be a separate
 stage, not a change to `contentHash`. The exact hash stays exactly as-is (it is
 correct and cheap); clustering runs *after* a row survives exact dedup.
 
-### Data model (Prisma)
-- New nullable `clusterId String?` on `ContentItem` (+ `@@index([clusterId])`).
-- Either a lightweight `StoryCluster` model (`id`, `canonicalItemId`,
-  `createdAt`) or a self-referencing `canonicalId` on `ContentItem`. Leaning
-  `StoryCluster` for a clean "canonical + members" query. **Decide in review.**
-- Migration is additive/nullable → safe; existing rows are singleton clusters.
+### Data model (Prisma) — DECIDED: StoryCluster table
+- New `StoryCluster` model: `id`, `canonicalItemId` (FK → ContentItem),
+  `createdAt`. Cluster-level metadata has a home; canonical pointer lives in one
+  place; "canonical + members" is a plain join.
+- `ContentItem` gets a nullable `clusterId String?` FK → `StoryCluster`
+  (+ `@@index([clusterId])`).
+- Migration is additive/nullable → safe. Existing rows stay `clusterId = null`
+  (implicit singletons); no backfill required to ship (optional backfill noted
+  below).
 
-### Matching (in `@rovrum/core`, pure + unit-tested)
+### Matching (in `@rovrum/core`, pure + unit-tested) — DECIDED: token-set, conservative
 - `clusterKey(title)`: lowercase, strip punctuation, drop stopwords + a small
   local-noise list ("rotherham", "millers", "rufc", etc. — tune carefully so we
   don't over-merge), sort tokens → a normalized token set.
-- `similarity(a, b)`: token-set ratio (Jaccard/Sørensen) and/or trigram; a
-  tuned threshold decides "same story". Pure function, exhaustively unit-tested
-  with real headline pairs from the two publishers.
-- Candidate window: only compare against items with `publishedAt` within N hours
-  (default ~48h) and ideally the same `vertical`, to bound comparisons and avoid
-  merging a re-run of an old story.
+- `similarity(a, b)`: **Sørensen–Dice over the token sets**. Pure function,
+  exhaustively unit-tested with real Advertiser/Star headline pairs.
+- **Starting threshold: 0.8 (conservative).** Merge only near-certain matches;
+  prefer missing a dupe over wrongly merging distinct stories. Exposed as a named
+  constant and tuned down with real data.
+- Candidate window — **DECIDED: 48h AND same `vertical`.** Only compare against
+  items with `publishedAt` within 48h and the same vertical. Bounds comparisons,
+  keeps matches on-topic, and stops a re-run of an old story merging.
 
 ### Pipeline placement (`apps/workers`)
 - After exact-dedup insert, a clustering step assigns `clusterId`:
@@ -106,8 +114,27 @@ correct and cheap); clustering runs *after* a row survives exact dedup.
 - Threshold is the main risk (over-merging distinct stories). Ship conservative
   (high threshold) and tune with real data; log near-threshold decisions.
 
-## Open questions for the reviewer
-1. `StoryCluster` model vs self-referencing `canonicalId`?
-2. Time window (48h?) and whether to require same `vertical`.
-3. Similarity metric + starting threshold — conservative to avoid over-merge.
-4. Confirm dropping Advertiser "All" (and the RUFC-feed audit outcome).
+## Resolved decisions (agreed with owner)
+1. **Cluster model:** `StoryCluster` table + nullable `clusterId` on `ContentItem`
+   (not a self-referencing `canonicalId`).
+2. **Match window:** 48h AND same `vertical`.
+3. **Similarity:** Sørensen–Dice over normalized token sets; starting threshold
+   **0.8 (conservative)**, exposed as a constant and tuned with real data.
+4. **RUFC feeds:** keep all overlapping Sport + Rotherham-United feeds (Advertiser
+   and Star). Exact hash collapses identical items; clustering groups the rest.
+   Advertiser "All" already dropped in the prior merged PR (#26).
+
+## Proposed work breakdown (for review before coding)
+1. **DB migration** — `StoryCluster` model + `ContentItem.clusterId` + index.
+2. **`@rovrum/core`** — `clusterKey` + `similarity` (Sørensen–Dice) + `THRESHOLD`
+   constant, with the headline-pair unit-test suite (true positives + near-miss
+   negatives). Correctness is won here.
+3. **`apps/workers`** — clustering stage after exact-dedup insert: query the 48h
+   same-vertical candidates, best-match ≥ threshold → join cluster, else new
+   singleton + become canonical. Wrapped best-effort (failure → singleton, never
+   drops the item). Extend `IngestRun.stats` with `clustered` / `newClusters`.
+4. **Canonical rule** — earliest `publishedAt`, tie-broken by source priority
+   (native Advertiser/MBC > regional Star/BBC), as a reviewable constant.
+
+Each is a candidate for its own PR (migration first). No web/API work — that's
+Phase 2, noted above.
