@@ -33,12 +33,16 @@ Yorkshire` · `Free · Online edition`), oversized `Rovrum.` nameplate with red 
 
 ### 2. News feed page — front-page composition on page 1
 
-- **Page 1:** lead (first item, large headline + image + deck + byline + "also
-  reported by") → secondary stack (next 3 as briefs) → three-column run (remaining
-  items with column dividers).
-- **Pages 2+:** the composition doesn't apply (no "lead" past the front page) → fall
-  back to a clean single-column story list (reuse the column-run card styling).
-- Pagination unchanged (`paginate()` + `Pagination.astro`).
+- **Page 1:** lead (first item) → secondary stack (next 3 as briefs) → a capped
+  three-story "More from Rotherham" run. **Exactly 7 items** (1 + 3 + 3).
+- **Pages 2+:** the remaining items in the **three-across grid** (same `StoryCard`
+  + column dividers as the front-page run), `NEWS_PER_PAGE` (20) per page.
+- Manual paging in `getStaticPaths` (not Astro's `paginate()`, which can't give
+  page 1 a different size than the rest). Front-page sizes (`FRONT_TOTAL`,
+  `FRONT_BRIEFS`, `FRONT_RUN`) live in `lib/news.ts` and are imported — Astro's
+  `getStaticPaths` runs in an isolated scope and can't close over page-level
+  consts, but module imports are in scope.
+- Pager URLs built by hand (`/news`, `/news/2`, …); `Pagination.astro` reused.
 - Empty state preserved (`Nowt to show just yet…`).
 
 ### 3. Components
