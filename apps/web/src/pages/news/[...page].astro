@@ -1,55 +1,29 @@
 ---
-// The News feed — a broadsheet front page under /news (/news, /news/2, …).
-// SSG: getStaticPaths pulls every NEWS item and pages it by hand (paginate()
-// can't give page 1 a different size). Page 1 is a composed front page — 1 lead
-// + 3 briefs + a 3-story "More from Rotherham" run (7 items). Pages 2+ are a
-// three-across grid of the remaining items. Every headline links OUT to its
-// source (aggregator boundary). See docs/plans/news-broadsheet-design.md.
+// The News listing — paginated three-across grid under /news (/news, /news/2, …).
+// Every headline links OUT to its source (aggregator boundary).
 import type { GetStaticPaths } from "astro";
 import Layout from "../../layouts/Layout.astro";
-import LeadStory from "../../components/LeadStory.astro";
-import Brief from "../../components/Brief.astro";
 import StoryCard from "../../components/StoryCard.astro";
 import Pagination from "../../components/Pagination.astro";
-import {
-  getAllNews,
-  NEWS_PER_PAGE,
-  FRONT_BRIEFS,
-  FRONT_RUN,
-  FRONT_TOTAL,
-  type NewsCardView,
-} from "../../lib/news.js";
+import { getAllNews, NEWS_PER_PAGE, type NewsCardView } from "../../lib/news.js";
 
 export const getStaticPaths = (async () => {
   const items = await getAllNews();
-
-  // Page 1 = first FRONT_TOTAL items; the rest paginate in grids of NEWS_PER_PAGE.
-  const front = items.slice(0, FRONT_TOTAL);
-  const rest = items.slice(FRONT_TOTAL);
-  const restPages = Math.ceil(rest.length / NEWS_PER_PAGE);
-  const lastPage = 1 + restPages;
+  const totalPages = Math.ceil(items.length / NEWS_PER_PAGE);
 
   const path = (n: number) => (n === 1 ? undefined : String(n));
 
-  const pages = [
-    {
-      params: { page: path(1) },
-      props: { current: 1, lastPage, items: front },
-    },
-    ...Array.from({ length: restPages }, (_, i) => {
-      const current = i + 2;
-      return {
-        params: { page: path(current) },
-        props: {
-          current,
-          lastPage,
-          items: rest.slice(i * NEWS_PER_PAGE, (i + 1) * NEWS_PER_PAGE),
-        },
-      };
-    }),
-  ];
-
-  return pages;
+  return Array.from({ length: totalPages }, (_, i) => {
+    const current = i + 1;
+    return {
+      params: { page: path(current) },
+      props: {
+        current,
+        lastPage: totalPages,
+        items: items.slice(i * NEWS_PER_PAGE, (i + 1) * NEWS_PER_PAGE),
+      },
+    };
+  });
 }) satisfies GetStaticPaths;
 
 interface Props {
@@ -59,18 +33,10 @@ interface Props {
 }
 
 const { current, lastPage, items } = Astro.props;
-const isFront = current === 1;
 
-// Front-page split: 1 lead, 3 briefs, 3 in the run.
-const [lead, ...restFront] = items;
-const briefs = restFront.slice(0, FRONT_BRIEFS);
-const run = restFront.slice(FRONT_BRIEFS, FRONT_BRIEFS + FRONT_RUN);
-
-// Pager URLs (manual paging → build them ourselves).
 const prevUrl = current === 1 ? undefined : current === 2 ? "/news" : `/news/${current - 1}`;
 const nextUrl = current < lastPage ? `/news/${current + 1}` : undefined;
-
-const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum`;
+const title = current === 1 ? "News — Rovrum" : `News — page ${current} — Rovrum`;
 ---
 
 <Layout
@@ -81,36 +47,6 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
   {
     items.length === 0 ? (
       <p class="feed__empty">Nowt to show just yet — check back soon.</p>
-    ) : isFront && lead ? (
-      <>
-        <div class="front">
-          <div class="front__lead">
-            <LeadStory item={lead} />
-          </div>
-          {briefs.length > 0 && (
-            <aside class="front__aside">
-              <p class="aside__label">Also this morning</p>
-              {briefs.map((item) => (
-                <Brief item={item} />
-              ))}
-            </aside>
-          )}
-        </div>
-
-        {run.length > 0 && (
-          <section>
-            <div class="band">
-              <h2>More from Rotherham</h2>
-              <small>Updated hourly</small>
-            </div>
-            <div class="columns">
-              {run.map((item) => (
-                <StoryCard item={item} />
-              ))}
-            </div>
-          </section>
-        )}
-      </>
     ) : (
       <section>
         <div class="band">
@@ -138,45 +74,6 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
     font-size: 1.1rem;
   }
 
-  /* ── Front page: lead + secondary stack ─────────────────── */
-  .front {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-    padding-top: 1.75rem;
-  }
-  @media (min-width: 52rem) {
-    .front {
-      grid-template-columns: 1.7fr 1fr;
-      column-gap: 2.25rem;
-    }
-  }
-
-  .front__aside {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 3px solid var(--ink);
-  }
-  @media (min-width: 52rem) {
-    .front__aside {
-      margin-top: 0;
-      padding-top: 0;
-      border-top: 0;
-      border-left: 1px solid var(--line-strong);
-      padding-left: 2.25rem;
-    }
-  }
-  .aside__label {
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: 0.95rem;
-    letter-spacing: 0.02em;
-    margin: 0 0 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--ink);
-  }
-
-  /* ── Section band ───────────────────────────────────────── */
   .band {
     display: flex;
     align-items: baseline;
@@ -199,7 +96,6 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
     margin-left: auto;
   }
 
-  /* ── Three-column run (front page) ──────────────────────── */
   .columns {
     padding-top: 1.5rem;
     display: grid;
@@ -217,7 +113,6 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
       column-gap: 2.5rem;
       row-gap: 2.5rem;
     }
-    /* vertical hairlines in the middle of the column-gap */
     .columns > :global(.story:not(:nth-child(3n + 1))) {
       position: relative;
     }
