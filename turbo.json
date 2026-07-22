@@ -16,7 +16,11 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types", "db:generate"]
+      // ^build so workspace deps' dist/ (and their .d.ts) exist — packages
+      // import each other's types through their package `exports` → dist. Without
+      // this, a clean checkout (e.g. CI) fails with "Cannot find module
+      // '@rovrum/db'"; it only ever passed locally on stale dist/.
+      "dependsOn": ["^build", "^check-types", "db:generate"]
     },
     "test": {
       "dependsOn": ["^build"]
