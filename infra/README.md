@@ -58,3 +58,11 @@ docker compose -f infra/docker-compose.yml up -d postgres
 pnpm db:migrate && pnpm --filter @rovrum/workers seed
 pnpm --filter @rovrum/workers dev    # tsx watch; Ctrl-C to stop
 ```
+
+## Tests and your dev data
+
+The `@rovrum/workers` integration tests run against an **isolated `rovrum_test`
+Postgres schema** on the same database, derived automatically from your
+`DATABASE_URL` (see `apps/workers/vitest.config.ts`). They never touch the `public`
+schema, so `pnpm test` leaves your seeded `content_items` intact (issue #21). No
+extra setup or env var is needed — the test schema is created on first run.
