@@ -40,6 +40,11 @@ async function makeSource(overrides: Record<string, unknown> = {}): Promise<stri
   return s.id;
 }
 
+// This suite runs against an isolated `rovrum_test` Postgres schema (forced by
+// vitest.config.ts + vitest.global-setup.ts), NOT the dev `public` schema — so
+// the deleteMany cleanup below never wipes seeded dev data (issue #21). Do not
+// re-point it at the dev DB.
+//
 // Clean content between tests so dedup assertions are deterministic. Clusters
 // reference content items, so clear them first (FK order).
 beforeEach(async () => {
