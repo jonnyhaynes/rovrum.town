@@ -1,0 +1,67 @@
+---
+// A compact secondary-stack item for the front-page "Also this morning" column.
+// No image — headline + short deck + byline. Links OUT (aggregator boundary).
+import type { NewsCardView } from "../lib/news.js";
+import { relativeTime } from "../lib/format.js";
+
+interface Props {
+  item: NewsCardView;
+}
+
+const { item } = Astro.props;
+const when = item.publishedAt ? relativeTime(item.publishedAt) : null;
+---
+
+<article class="brief">
+  <h3 class="headline">
+    <a href={item.canonicalUrl} target="_blank" rel="noopener noreferrer">{item.title}</a>
+  </h3>
+  {item.excerpt && <p class="deck">{item.excerpt}</p>}
+  <p class="byline">{item.sourceName}{when && <> · {when}</>}</p>
+</article>
+
+<style>
+  .brief {
+    padding-top: 1.1rem;
+    margin-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+  /* the first brief in the stack sits flush under the label */
+  .brief:first-child {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: 0;
+  }
+
+  .headline {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.12rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .headline a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .headline a:hover {
+    color: var(--red);
+  }
+
+  .deck {
+    color: var(--slate);
+    text-wrap: pretty;
+    margin: 0.35rem 0 0;
+    font-size: 0.9rem;
+  }
+
+  .byline {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0.5rem 0 0;
+  }
+</style>

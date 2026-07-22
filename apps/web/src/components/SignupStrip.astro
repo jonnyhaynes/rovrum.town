@@ -1,0 +1,198 @@
+---
+// Mailing-list signup strip. Reuses the holding page's Web3Forms client-side
+// POST pattern (no backend). The access key is already public in the committed
+// holding page, so this isn't a new secret; kept as a constant here so it can be
+// lifted to an env var later without touching markup. Progressive enhancement:
+// the form works as a normal submit; JS intercepts for an inline success state.
+const WEB3FORMS_ACCESS_KEY = "e354ff92-5070-48e9-8105-7931a4d2d0bd";
+---
+
+<section class="signup" aria-labelledby="signup-title" data-access-key={WEB3FORMS_ACCESS_KEY}>
+  <p class="signup__eyebrow">The Rovrum round-up</p>
+  <h2 id="signup-title">Be first through t' door</h2>
+  <p class="signup__blurb">
+    The best of Rotherham's news, sport, events an' jobs — landing in your inbox. No faffing, no
+    spam.
+  </p>
+
+  <form class="signup__form" action="https://api.web3forms.com/submit" method="post" novalidate>
+    <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+    <input type="hidden" name="subject" value="New Rovrum round-up signup" />
+    <input type="hidden" name="from_name" value="Rovrum news feed" />
+    <label class="sr-only" for="signup-email">Your email address</label>
+    <input
+      class="signup__input"
+      type="email"
+      name="email"
+      id="signup-email"
+      required
+      autocomplete="email"
+      placeholder="you@example.com"
+    />
+    <button class="signup__button" type="submit">Notify me</button>
+  </form>
+
+  <p class="signup__note" role="status" aria-live="polite">
+    One email, when there's summat worth knowing.
+  </p>
+</section>
+
+<script>
+  // Enhance each signup form on the page: intercept submit, POST JSON to
+  // Web3Forms, and swap the note for an inline success/error message.
+  for (const section of document.querySelectorAll<HTMLElement>(".signup")) {
+    const form = section.querySelector<HTMLFormElement>(".signup__form");
+    const email = section.querySelector<HTMLInputElement>(".signup__input");
+    const button = section.querySelector<HTMLButtonElement>(".signup__button");
+    const note = section.querySelector<HTMLElement>(".signup__note");
+    const accessKey = section.dataset.accessKey;
+    if (!form || !email || !button || !note || !accessKey) continue;
+
+    const fail = (msg: string) => {
+      note.textContent = msg;
+      note.classList.add("signup__note--error");
+      button.disabled = false;
+      button.textContent = "Notify me";
+    };
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      note.classList.remove("signup__note--error");
+
+      if (!email.checkValidity()) {
+        fail("That email doesn't look reyt — give it another go.");
+        email.focus();
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Signing tha' up…";
+
+      fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: accessKey,
+          email: email.value,
+          subject: "New Rovrum round-up signup",
+          from_name: "Rovrum news feed",
+        }),
+      })
+        .then((r) => r.json())
+        .then((data: { success?: boolean }) => {
+          if (data && data.success) {
+            form.hidden = true;
+            note.textContent = "Reyt, you're on the list. We'll be in touch. Ta.";
+          } else {
+            fail("Summat went wrong — try again in a bit.");
+          }
+        })
+        .catch(() => fail("Couldn't reach us — check tha' connection and try again."));
+    });
+  }
+</script>
+
+<style>
+  .signup {
+    margin-top: 3.5rem;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    background: var(--ink);
+    color: var(--paper);
+    border-top: 3px solid var(--red);
+    display: grid;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .signup__eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0;
+  }
+
+  .signup h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    margin: 0.15rem 0 0;
+    color: var(--paper);
+  }
+
+  .signup__blurb {
+    margin: 0 auto;
+    max-width: 44ch;
+    color: #cfcabf;
+    font-size: 0.95rem;
+  }
+
+  .signup__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+    margin: 1rem auto 0;
+    max-width: 30rem;
+    width: 100%;
+  }
+
+  .signup__input {
+    flex: 1 1 14rem;
+    min-width: 0;
+    padding: 0.8rem 1rem;
+    font: inherit;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--paper);
+    border-radius: 0;
+  }
+  .signup__input:focus-visible {
+    outline: 2px solid var(--red);
+    outline-offset: 2px;
+  }
+
+  .signup__button {
+    flex: 0 0 auto;
+    padding: 0.8rem 1.5rem;
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--paper);
+    background: var(--red);
+    border: 2px solid var(--red);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .signup__button:hover {
+    background: #9c3227;
+    border-color: #9c3227;
+  }
+  .signup__button:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+
+  .signup__note {
+    margin: 0.6rem 0 0;
+    font-size: 0.78rem;
+    color: var(--stone);
+  }
+  .signup__note--error {
+    color: #e59a90;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

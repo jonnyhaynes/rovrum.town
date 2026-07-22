@@ -21,3 +21,16 @@ export function relativeTime(date: Date, now: Date = new Date()): string {
     year: "numeric",
   });
 }
+
+/**
+ * A full masthead-style date, e.g. "Tuesday, 22 July 2026". Used for the
+ * broadsheet folio line. `date` defaults to now (the SSG build time).
+ */
+export function longDate(date: Date = new Date()): string {
+  return date.toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}

@@ -1,83 +1,129 @@
 ---
-// The News feed — home of the vertical, served under /news (/news, /news/2, …)
-// until go-live. SSG: getStaticPaths pulls every NEWS item from the data layer
-// at build time and paginate() slices it into pages. Each card links OUT to its
-// source (aggregator boundary). See docs/plans/phase-2-web-mvp.md §5.
-import type { GetStaticPaths, Page } from "astro";
+// The News listing — paginated three-across grid under /news (/news, /news/2, …).
+// Every headline links OUT to its source (aggregator boundary).
+import type { GetStaticPaths } from "astro";
 import Layout from "../../layouts/Layout.astro";
-import ArticleCard from "../../components/ArticleCard.astro";
+import StoryCard from "../../components/StoryCard.astro";
 import Pagination from "../../components/Pagination.astro";
 import { getAllNews, NEWS_PER_PAGE, type NewsCardView } from "../../lib/news.js";
 
-export const getStaticPaths = (async ({ paginate }) => {
+export const getStaticPaths = (async () => {
   const items = await getAllNews();
-  return paginate(items, { pageSize: NEWS_PER_PAGE });
+  const totalPages = Math.ceil(items.length / NEWS_PER_PAGE);
+
+  const path = (n: number) => (n === 1 ? undefined : String(n));
+
+  return Array.from({ length: totalPages }, (_, i) => {
+    const current = i + 1;
+    return {
+      params: { page: path(current) },
+      props: {
+        current,
+        lastPage: totalPages,
+        items: items.slice(i * NEWS_PER_PAGE, (i + 1) * NEWS_PER_PAGE),
+      },
+    };
+  });
 }) satisfies GetStaticPaths;
 
 interface Props {
-  page: Page<NewsCardView>;
+  current: number;
+  lastPage: number;
+  items: NewsCardView[];
 }
 
-const { page } = Astro.props;
-const title = page.currentPage > 1 ? `News — page ${page.currentPage} — Rovrum` : "News — Rovrum";
+const { current, lastPage, items } = Astro.props;
+
+const prevUrl = current === 1 ? undefined : current === 2 ? "/news" : `/news/${current - 1}`;
+const nextUrl = current < lastPage ? `/news/${current + 1}` : undefined;
+const title = current === 1 ? "News — Rovrum" : `News — page ${current} — Rovrum`;
 ---
 
-<Layout title={title} description="Local news from across Rotherham, all in one place.">
-  <div class="feed">
-    <header class="feed__head">
-      <p class="feed__eyebrow">Rovrum · News</p>
-      <h1 class="feed__title">Everything Rovrum, in one spot.</h1>
-    </header>
-
-    {
-      page.data.length === 0 ? (
-        <p class="feed__empty">Nowt to show just yet — check back soon.</p>
-      ) : (
-        <div class="feed__list">
-          {page.data.map((item) => (
-            <ArticleCard item={item} />
+<Layout
+  title={title}
+  description="Local news from across Rotherham, all in one place."
+  section="news"
+>
+  {
+    items.length === 0 ? (
+      <p class="feed__empty">Nowt to show just yet — check back soon.</p>
+    ) : (
+      <section>
+        <div class="band">
+          <h2>News</h2>
+          <small>
+            Page {current} of {lastPage}
+          </small>
+        </div>
+        <div class="columns">
+          {items.map((item) => (
+            <StoryCard item={item} />
           ))}
         </div>
-      )
-    }
+      </section>
+    )
+  }
 
-    <Pagination
-      prevUrl={page.url.prev}
-      nextUrl={page.url.next}
-      current={page.currentPage}
-      last={page.lastPage}
-    />
-  </div>
+  <Pagination prevUrl={prevUrl} nextUrl={nextUrl} current={current} last={lastPage} />
 </Layout>
 
 <style>
-  .feed {
-    max-width: 46rem;
-    margin: 0 auto;
-    padding: 2.5rem 1.25rem 4rem;
-  }
-
-  .feed__head {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--ink);
-  }
-
-  .feed__eyebrow {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: var(--stone);
-    margin: 0 0 0.4rem;
-  }
-
-  .feed__title {
-    font-size: clamp(1.6rem, 5vw, 2.3rem);
-    margin: 0;
-  }
-
   .feed__empty {
     color: var(--stone);
-    padding: 2rem 0;
+    padding: 3rem 0;
+    font-size: 1.1rem;
+  }
+
+  .band {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin: 3rem 0 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 3px solid var(--ink);
+  }
+  .band h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .band small {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-left: auto;
+  }
+
+  .columns {
+    padding-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 40rem) {
+    .columns {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 60rem) {
+    .columns {
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 2.5rem;
+      row-gap: 2.5rem;
+    }
+    .columns > :global(.story:not(:nth-child(3n + 1))) {
+      position: relative;
+    }
+    .columns > :global(.story:not(:nth-child(3n + 1)))::before {
+      content: "";
+      position: absolute;
+      left: -1.25rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--line);
+    }
   }
 </style>

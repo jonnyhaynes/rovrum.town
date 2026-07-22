@@ -1,0 +1,103 @@
+---
+// A standard story card — used in the front-page three-column run and in the
+// page-2+ list. Image on top, serif headline, deck, byline, and the "also
+// reported by" cluster credit. Aggregator boundary: the headline links OUT to
+// canonicalUrl, never an on-site route. See docs/plans/news-broadsheet-design.md.
+import type { NewsCardView } from "../lib/news.js";
+import { relativeTime } from "../lib/format.js";
+
+interface Props {
+  item: NewsCardView;
+}
+
+const { item } = Astro.props;
+const when = item.publishedAt ? relativeTime(item.publishedAt) : null;
+---
+
+<article class="story">
+  {
+    item.imageUrl && (
+      <a
+        class="story__img-link"
+        href={item.canonicalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <img class="story__img" src={item.imageUrl} alt="" loading="lazy" />
+      </a>
+    )
+  }
+  <h3 class="headline">
+    <a href={item.canonicalUrl} target="_blank" rel="noopener noreferrer">{item.title}</a>
+  </h3>
+  {item.excerpt && <p class="deck">{item.excerpt}</p>}
+  <p class="byline">
+    <span class="byline__source">{item.sourceName}</span>{when && <> · {when}</>}
+  </p>
+  {
+    item.alsoReportedBy.length > 0 && (
+      <p class="also">also reported by {item.alsoReportedBy.join(", ")}</p>
+    )
+  }
+</article>
+
+<style>
+  .story__img-link {
+    display: block;
+  }
+  .story__img {
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 0.85rem;
+    filter: saturate(0.92) contrast(1.02);
+    background: var(--line);
+  }
+
+  .headline {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.28rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+  }
+  .headline a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .headline a:hover {
+    color: var(--red);
+  }
+
+  .deck {
+    color: var(--slate);
+    text-wrap: pretty;
+    margin: 0.5rem 0 0;
+    font-size: 0.95rem;
+  }
+
+  .byline {
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0.7rem 0 0;
+  }
+  .byline__source {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .also {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--stone);
+    margin: 0.35rem 0 0;
+  }
+</style>

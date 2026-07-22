@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { relativeTime } from "./format.js";
+import { relativeTime, longDate } from "./format.js";
 
 const now = new Date("2026-07-10T12:00:00Z");
 
@@ -24,5 +24,12 @@ describe("relativeTime", () => {
     const out = relativeTime(new Date("2026-06-01T12:00:00Z"), now);
     expect(out).toMatch(/2026/);
     expect(out).not.toMatch(/ago/);
+  });
+});
+
+describe("longDate", () => {
+  it("formats a full masthead-style date", () => {
+    // 22 July 2026 is a Wednesday.
+    expect(longDate(new Date("2026-07-22T09:00:00Z"))).toBe("Wednesday, 22 July 2026");
   });
 });

@@ -1,6 +1,6 @@
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { describe, it, expect } from "vitest";
-import ArticleCard from "./ArticleCard.astro";
+import StoryCard from "./StoryCard.astro";
 import type { NewsCardView } from "../lib/news.js";
 
 const base: NewsCardView = {
@@ -17,10 +17,10 @@ const base: NewsCardView = {
 
 async function render(item: NewsCardView): Promise<string> {
   const container = await AstroContainer.create();
-  return container.renderToString(ArticleCard, { props: { item } });
+  return container.renderToString(StoryCard, { props: { item } });
 }
 
-describe("ArticleCard", () => {
+describe("StoryCard", () => {
   it("shows the headline and excerpt", async () => {
     const html = await render(base);
     expect(html).toContain("Rotherham council approves new riverside park");
@@ -43,7 +43,7 @@ describe("ArticleCard", () => {
     expect(html).not.toMatch(/<img[^>]*src=["'](undefined|null|)["']/);
   });
 
-  // LOAD-BEARING (aggregator boundary, docs/plans/phase-2-web-mvp.md §5, §7):
+  // LOAD-BEARING (aggregator boundary, docs/plans/news-broadsheet-design.md):
   // the card's primary link must point at the source's canonicalUrl — never an
   // internal route. This test fails if a future change makes the card link
   // on-site, which would turn the aggregator into a rehost.

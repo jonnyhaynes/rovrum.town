@@ -1,0 +1,134 @@
+---
+// Broadsheet masthead: folio line, oversized wordmark, tagline, double rule and
+// the section strap. Shared across every vertical via Layout. Copy matches the
+// holding page (Rotherham · South Yorkshire / "Aye, that Rotherham. Said proper.").
+import { longDate } from "../lib/format.js";
+
+interface Props {
+  /** Which section strap link is the current page (lowercased key). */
+  active?: string;
+}
+
+const { active = "news" } = Astro.props;
+
+// Build-time date for the folio line (SSG — evaluated when the site is built).
+const today = longDate(new Date());
+
+const sections = [
+  { key: "news", label: "News", href: "/news" },
+  // { key: "sport", label: "Sport", href: "#" },
+  // { key: "whats-on", label: "What's On", href: "#" },
+  // { key: "jobs", label: "Jobs", href: "#" },
+  // { key: "millers", label: "The Millers", href: "#" },
+];
+---
+
+<header class="masthead">
+  <div class="masthead__folio">
+    <span>{today}</span>
+    <span>Rotherham · South Yorkshire</span>
+    <span>Free · Online edition</span>
+  </div>
+
+  <a class="masthead__nameplate" href="/" aria-label="Rovrum — home">
+    <h1 class="masthead__title">Rovrum<span class="dot">.</span></h1>
+  </a>
+  <p class="masthead__tagline">Aye, that Rotherham. Said proper.</p>
+
+  <div class="rule-double" aria-hidden="true"></div>
+
+  <nav class="strap" aria-label="Sections">
+    {
+      sections.map((s) => (
+        <a href={s.href} aria-current={s.key === active ? "page" : undefined}>
+          {s.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>
+
+<style>
+  .masthead {
+    padding-top: clamp(1.25rem, 3vw, 2.25rem);
+  }
+
+  .masthead__folio {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stone);
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .masthead__folio span:nth-child(2) {
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .masthead__nameplate {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+  }
+  .masthead__title {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(3.4rem, 12vw, 8.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-align: center;
+    margin: clamp(0.6rem, 2vw, 1.4rem) 0 0;
+  }
+  .masthead__title .dot {
+    color: var(--red);
+  }
+
+  .masthead__tagline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 700;
+    color: var(--red);
+    text-align: center;
+    font-size: clamp(0.95rem, 2vw, 1.2rem);
+    margin: 0.5rem 0 0;
+  }
+
+  /* the classic double rule: thick over thin */
+  .rule-double {
+    margin-top: clamp(0.9rem, 2vw, 1.4rem);
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    height: 4px;
+  }
+
+  .strap {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem 2rem;
+    flex-wrap: wrap;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .strap a {
+    text-decoration: none;
+    color: inherit;
+    padding-bottom: 2px;
+  }
+  .strap a[aria-current] {
+    color: var(--red);
+    font-weight: 600;
+  }
+  .strap a:hover {
+    color: var(--ink);
+  }
+</style>

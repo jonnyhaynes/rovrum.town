@@ -1,0 +1,80 @@
+---
+// Site footer: social links + colophon, matching the holding page exactly.
+const socials = [
+  { label: "X", href: "https://x.com/rovrumtown" },
+  { label: "Facebook", href: "https://www.facebook.com/rovrum.town/" },
+  { label: "Instagram", href: "https://www.instagram.com/rovrum.town/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/rovrumtown" },
+  { label: "TikTok", href: "https://www.tiktok.com/@rovrum.town" },
+];
+---
+
+<footer class="site-footer">
+  <ul class="socials">
+    {
+      socials.map((s) => (
+        <li>
+          <a href={s.href} target="_blank" rel="noopener me" aria-label={`Rovrum on ${s.label}`}>
+            {s.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="colophon">
+    © 2026. A <a href="https://www.colouringcode.com" target="_blank" rel="noopener"
+      >Colouring Code</a
+    > design and build. Made with <span class="heart" aria-hidden="true">♥</span> in Rovrum.
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 3px solid var(--ink);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 1.5rem;
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.74rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--slate);
+  }
+  .socials a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .socials a:hover {
+    color: var(--red);
+  }
+
+  .colophon {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--stone);
+    text-align: right;
+  }
+  .colophon a {
+    color: inherit;
+  }
+  .colophon a:hover {
+    color: var(--red);
+    text-decoration: underline;
+  }
+  .colophon .heart {
+    color: var(--red);
+  }
+</style>

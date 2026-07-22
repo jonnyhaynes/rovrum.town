@@ -1,0 +1,157 @@
+---
+// Rovrum homepage — broadsheet front page. 1 lead + 3 briefs + 3 in the
+// "More from Rotherham" run. Sports, events and jobs will be woven in over
+// time. Aggregator boundary: every headline links OUT to its source.
+import Layout from "../layouts/Layout.astro";
+import LeadStory from "../components/LeadStory.astro";
+import Brief from "../components/Brief.astro";
+import StoryCard from "../components/StoryCard.astro";
+import {
+  getAllNews,
+  FRONT_BRIEFS,
+  FRONT_RUN,
+  FRONT_TOTAL,
+} from "../lib/news.js";
+
+const all = await getAllNews();
+const items = all.slice(0, FRONT_TOTAL);
+const [lead, ...rest] = items;
+const briefs = rest.slice(0, FRONT_BRIEFS);
+const run = rest.slice(FRONT_BRIEFS, FRONT_BRIEFS + FRONT_RUN);
+---
+
+<Layout title="Rovrum — everything Rotherham" description="Local news, sport, events and jobs, all in one place.">
+  {
+    items.length === 0 ? (
+      <p class="feed__empty">Nowt to show just yet — check back soon.</p>
+    ) : (
+      <>
+        <div class="front">
+          <div class="front__lead">
+            <LeadStory item={lead!} />
+          </div>
+    {briefs.length > 0 && (
+      <aside class="front__aside">
+        <p class="aside__label">Also this morning</p>
+        {briefs.map((item) => (
+          <Brief item={item} />
+        ))}
+      </aside>
+    )}
+  </div>
+
+  {run.length > 0 && (
+    <section>
+      <div class="band">
+        <h2>More from Rotherham</h2>
+        <small>Updated hourly</small>
+      </div>
+      <div class="columns">
+        {run.map((item) => (
+          <StoryCard item={item} />
+        ))}
+      </div>
+    </section>
+  )}
+      </>
+    )
+  }
+</Layout>
+
+<style>
+  .feed__empty {
+    color: var(--stone);
+    padding: 3rem 0;
+    font-size: 1.1rem;
+  }
+
+  .front {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding-top: 1.75rem;
+  }
+  @media (min-width: 52rem) {
+    .front {
+      grid-template-columns: 1.7fr 1fr;
+      column-gap: 2.25rem;
+    }
+  }
+
+  .front__aside {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 3px solid var(--ink);
+  }
+  @media (min-width: 52rem) {
+    .front__aside {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+      border-left: 1px solid var(--line-strong);
+      padding-left: 2.25rem;
+    }
+  }
+  .aside__label {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .band {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin: 3rem 0 0;
+    padding-bottom: 0.6rem;
+    border-bottom: 3px solid var(--ink);
+  }
+  .band h2 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+  .band small {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-left: auto;
+  }
+
+  .columns {
+    padding-top: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 40rem) {
+    .columns {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 60rem) {
+    .columns {
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 2.5rem;
+      row-gap: 2.5rem;
+    }
+    .columns > :global(.story:not(:nth-child(3n + 1))) {
+      position: relative;
+    }
+    .columns > :global(.story:not(:nth-child(3n + 1)))::before {
+      content: "";
+      position: absolute;
+      left: -1.25rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--line);
+    }
+  }
+</style>

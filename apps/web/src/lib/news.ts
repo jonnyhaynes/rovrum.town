@@ -35,8 +35,20 @@ export interface GetLatestNewsOptions {
   limit?: number;
 }
 
-/** Items per feed page (SSG paginates the /news feed by this size). */
+/** Items per listing page (pages 2+ show this many in the three-across grid). */
 export const NEWS_PER_PAGE = 20;
+
+/**
+ * Front-page composition sizes: 1 lead + 3 briefs ("Also this morning") + 3 in
+ * the "More from Rotherham" run = 7 items shown on page 1. The rest paginate onto
+ * the listing pages. Kept here (not in the .astro frontmatter) so getStaticPaths
+ * and the page body share one source of truth — Astro's getStaticPaths runs in an
+ * isolated scope and can't close over page-level consts.
+ */
+export const FRONT_BRIEFS = 3;
+export const FRONT_RUN = 3;
+/** Total items on the front page (lead + briefs + run). */
+export const FRONT_TOTAL = 1 + FRONT_BRIEFS + FRONT_RUN;
 
 // Shared query pieces so every read stays consistent: NEWS-only, newest-first,
 // and the same narrow column set. Newest-first uses `id` as a stable tiebreak
