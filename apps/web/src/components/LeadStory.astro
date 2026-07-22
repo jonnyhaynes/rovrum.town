@@ -1,0 +1,130 @@
+---
+// The dominant front-page lead: large serif headline, image, deck with dropcap,
+// byline and the cross-publisher "also reported by" credit. Aggregator boundary:
+// the headline links OUT to canonicalUrl. See docs/plans/news-broadsheet-design.md.
+import type { NewsCardView } from "../lib/news.js";
+import { relativeTime } from "../lib/format.js";
+
+interface Props {
+  item: NewsCardView;
+}
+
+const { item } = Astro.props;
+const when = item.publishedAt ? relativeTime(item.publishedAt) : null;
+---
+
+<article class="lead">
+  <p class="kicker">News</p>
+  <h2 class="headline">
+    <a href={item.canonicalUrl} target="_blank" rel="noopener noreferrer">{item.title}</a>
+  </h2>
+
+  {
+    item.imageUrl && (
+      <a
+        class="lead__img-link"
+        href={item.canonicalUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <img class="lead__img" src={item.imageUrl} alt="" loading="eager" />
+      </a>
+    )
+  }
+
+  {item.excerpt && <p class="deck">{item.excerpt}</p>}
+
+  <p class="byline">
+    By <b>{item.sourceName}</b>{when && <> · {when}</>}
+  </p>
+
+  {
+    item.alsoReportedBy.length > 0 && (
+      <p class="also">also reported by {item.alsoReportedBy.join(", ")}</p>
+    )
+  }
+</article>
+
+<style>
+  .lead {
+    /* first column of the front-page grid */
+  }
+
+  .kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin: 0 0 0.5rem;
+  }
+
+  .headline {
+    font-family: var(--serif);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3.1rem);
+  }
+  .headline a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .headline a:hover {
+    color: var(--red);
+  }
+
+  .lead__img-link {
+    display: block;
+  }
+  .lead__img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+    margin: 1.1rem 0 0;
+    filter: saturate(0.92) contrast(1.02);
+    background: var(--line);
+  }
+
+  .deck {
+    color: var(--slate);
+    text-wrap: pretty;
+    margin: 0.9rem 0 0;
+    font-size: 1.05rem;
+    max-width: 46ch;
+  }
+  .deck::first-letter {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 3.1rem;
+    line-height: 0.8;
+    float: left;
+    padding: 0.2rem 0.5rem 0 0;
+    color: var(--ink);
+  }
+
+  .byline {
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 0.85rem 0 0;
+  }
+  .byline b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .also {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--stone);
+    margin: 0.4rem 0 0;
+  }
+</style>
