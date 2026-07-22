@@ -217,9 +217,18 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
       column-gap: 1.75rem;
       row-gap: 2.5rem;
     }
-    /* vertical hairlines between columns */
+    /* vertical hairlines in the middle of the column-gap */
     .columns > :global(.story:not(:nth-child(3n + 1))) {
-      border-left: 1px solid var(--line);
+      position: relative;
+    }
+    .columns > :global(.story:not(:nth-child(3n + 1)))::before {
+      content: "";
+      position: absolute;
+      left: -0.875rem;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--line);
     }
   }
 </style>
