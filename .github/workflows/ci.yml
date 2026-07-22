@@ -1,0 +1,79 @@
+# PR checks: lint, type-check, tests, build on every PR to main (and push to
+# main). Goes red if any step fails, giving the human reviewer a real signal to
+# gate the merge on. See docs/plans/ci-pr-checks.md.
+#
+# Hermetic: the @rovrum/workers integration tests need Postgres, so this spins up
+# a throwaway service container (NOT the real Neon DB — no secrets needed). Since
+# issue #21 those tests isolate themselves in a `rovrum_test` schema derived from
+# DATABASE_URL, so a plain ephemeral Postgres is all they require.
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# A newer push to the same branch cancels an in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: rovrum
+          POSTGRES_PASSWORD: rovrum
+          POSTGRES_DB: rovrum
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rovrum -d rovrum"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Throwaway local service container; `public` for the app, the workers
+      # tests re-point themselves to a `rovrum_test` schema (issue #21).
+      DATABASE_URL: postgresql://rovrum:rovrum@localhost:5432/rovrum?schema=public
+      DIRECT_URL: postgresql://rovrum:rovrum@localhost:5432/rovrum?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Apply migrations
+        # `deploy` (non-interactive) applies committed migrations — the CI DB is
+        # fresh each run, unlike `db:migrate` (`migrate dev`) which is dev-only.
+        run: pnpm --filter @rovrum/db exec prisma migrate deploy
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type-check
+        run: pnpm check-types
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
