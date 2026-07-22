@@ -214,7 +214,7 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
   @media (min-width: 60rem) {
     .columns {
       grid-template-columns: 1fr 1fr 1fr;
-      column-gap: 1.75rem;
+      column-gap: 2.5rem;
       row-gap: 2.5rem;
     }
     /* vertical hairlines in the middle of the column-gap */
@@ -224,7 +224,7 @@ const title = isFront ? "News — Rovrum" : `News — page ${current} — Rovrum
     .columns > :global(.story:not(:nth-child(3n + 1)))::before {
       content: "";
       position: absolute;
-      left: -0.875rem;
+      left: -1.25rem;
       top: 0;
       bottom: 0;
       width: 1px;
